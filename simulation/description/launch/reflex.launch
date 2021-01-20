@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- custom arguments -->
+    <arg name="run_sensors_node" default="true" />
+    <arg name="run_debug_node" default="true" />
+    <arg name="run_wrist_controller_node" default="true" />
+    <arg name="run_teleop_node" default="false" />
+    <arg name="run_reflex_commander_node" default="true" />
+    <arg name="launch_finger_controllers" default="true" />
+    <arg name="base_link_name" default="shell" />
+
+    <!-- currently supports "sphere", "box", "cylinder" -->
+    <arg name="spawn_object" default="true" />
+    <arg name="object_name" default="sphere" />
+
+    <!-- load robot_name to parameter server -->
+    <arg name="robot_name" default="reflex" />
+    <param name="robot_name" value="$(arg robot_name)" />
+
+    <!-- if running on real robot or in simulation_only (relevant for baseline_commander.cpp) -->
+    <arg name="simulation_only" default="true" />
+    <param name="simulation_only" value="$(arg simulation_only)" />
+
+    <!-- gazebo arguments  -->
+    <arg name="debug" default="false" />
+    <arg name="gui" default="true" />
+    <arg name="pause" default="false" />
+    <arg name="world_name" default="$(find description)/worlds/reflex.world" />
+
+    <!-- include gazebo_ros launcher -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)" />
+        <arg name="use_sim_time" value="true" />
+        <arg name="physics" value="dart" />
+        <arg name="verbose" value="true" />
+    </include>
+
+    <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model $(arg robot_name)" />
+
+    <param name="robot_description" command="
+        $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name)"/>
+
+    <!-- robot state publisher uses joint values from joint_state_publisher to publish poses of links to /tf tree -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="/joint_states" to="/reflex/joint_states"/>
+    </node>
+
+    <node pkg="joint_state_publisher" type="joint_state_publisher" output="screen" name="joint_state_publisher">
+        <param name="publish_default_velocities" value="true"/>
+        <param name="publish_default_efforts" value="true"/>
+        <param name="rate" value="100"/>
+        <remap from="/joint_states" to="/reflex/joint_states"/>
+    </node>
+
+    <!-- Keyboard teleoperation node -->
+    <group if="$(arg run_teleop_node)">
+        <node pkg="teleop" type="teleop_node" name="teleop_node" output="screen"/>
+    </group>
+
+    <!-- Launch controllers -->
+    <group if="$(arg launch_finger_controllers)">
+        <include file="$(find finger_controller)/launch/reflex_control.launch" />
+    </group>
+
+    <!-- Sensors node -->
+    <group if="$(arg run_sensors_node)">
+        <node pkg="sensor_listener" type="sensor_listener_node" name="sensor_listener_node" output="screen"/>
+    </group>
+
+    <!-- Run debug sensors on link (outputs force and penetration depth for each link) -->
+    <group if="$(arg run_debug_node)">
+        <node pkg="sensor_listener" type="sensor_listener_debug_node" name="sensor_listener_debug_node" output="screen"/>
+    </group>
+
+    <!-- Run Reflex commander node (high level grasp primitives) -->
+    <group if="$(arg run_reflex_commander_node)">
+        <node pkg="teleop" type="reflex_commander_node" name="reflex_commander_node" output="screen"/>
+    </group>
+
+    <!-- Wrist controller node -->
+    <group if="$(arg run_wrist_controller_node)">
+        <include file="$(find wrist_controller)/launch/wrist_controller.launch" />
+    </group>
+
+    <!-- launch an object -->
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="object_name" value="$(arg object_name)"/>
+    </include>
+
+</launch>

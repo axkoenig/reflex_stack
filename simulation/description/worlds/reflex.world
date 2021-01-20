@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <physics type="dart">
+      <!-- runs simuation as fast as possible -->
+      <real_time_update_rate>0</real_time_update_rate>
+      <dart>
+        <!-- <collision_detector>bullet</collision_detector> -->
+      </dart>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- modify camera view point -->
+    <gui>
+      <camera name="user_camera">
+        <!-- zoomed on reflex -->
+        <!-- <pose>0.211413 -0.480231 0.339124 0 0.499643 1.940195</pose> -->
+        <!-- zoomed on whole grapsing situation (with cylinder) -->
+        <pose>0.5 0.5 0.43 0 0.57 -2.47</pose>
+      </camera>
+    </gui>
+  </world>
+</sdf>
