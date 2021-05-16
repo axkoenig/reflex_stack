@@ -1,113 +1,52 @@
-# Teleoperated Grasp Refinement
+# Reflex Stack
 
-[![Build Status](https://travis-ci.com/axkoenig/grasp_refinement.svg?token=KeJradpJgXCJqZfQ8pwB&branch=main)](https://travis-ci.com/axkoenig/grasp_refinement)
+[![Build Status](https://travis-ci.com/axkoenig/reflex_stack.svg?token=KeJradpJgXCJqZfQ8pwB&branch=main)](https://travis-ci.com/axkoenig/reflex_stack)
 
-## Run Software with Singularity
+<img src="docs/screenshot.png"/>
 
-Install singularity on your local machine (remote machine should have singularity installed) and follow these steps.
+## System Architecture 
+This repository contains a simulator for Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
 
-On your local machine. 
+**Reflex Simulator**: The idea behind the Reflex simulator is that you swap out the simulator for the real hand without any hassle. To achieve this, the simulator uses the same ROS topics and message definitions as the real hand does. We model some features of the Reflex, such as the tactile sensors and the underactuated distal flexure. 
 
-```bash
-# 1. Build the singularity recipe to get a clean image with all required dependencies (e.g., Gazebo 11, ROS Noetic, RL packages)
-sudo singularity build gazebo_ros.img singularity.recipe 
+**Reflex Interface (RI)**: The RI consists of two parts. The *State* module stores the most up to date state information of the Reflex and calculates various useful metrics for grasp analysis (e.g. grasp wrench space, epsilon, grasp matrix, slip prediction, ...). The *Command* module offers high-level control of the robotic hand via ROS services. Further, the RI offers a Keyboard Teleoperation Node for manual control of the robotic hand and the wrist (useful for debugging). The RI will also work on the real hand, although with a reduced feature set (since less information is available).
 
-# 2. Create an overlay directory and build an overlay image
-mkdir -p overlay/upper overlay/work
-dd if=/dev/zero of=overlay.img bs=1M count=500 && mkfs.ext3 -d overlay overlay.img
+<img src="docs/system_design.png"/>
 
-# 3. Upload both images to your research cluster
-sudo sftp akoenig@login.rc.fas.harvard.edu
-put -r /home/parallels/catkin_ws/src/grasp_refinement/gazebo_ros.img
-put -r /home/parallels/catkin_ws/src/grasp_refinement/overlay.img
+## Installation
+0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04. You may want to run all this in a Docker container to avoid version conflicts. 
+1. Install ROS Noetic by following [these](http://wiki.ros.org/noetic/Installation/Ubuntu) steps.
+2. Clone this repository into a new catkin workspace.
 
-``` 
-
-On your remote machine do these steps. 
-
-```bash
-# create the same overlay directories as on local machine
-mkdir -p overlay/upper overlay/work
-
-# fire up your simulation container with the writable overlay to build the software
-singularity shell --overlay overlay.img gazebo_ros.img
-
-# create catkin workspace inside the overlay container and init a catkin workspace
-mkdir ~/overlay/work/catkin_ws/src -p
-cd ~/overlay/work/catkin_ws/src
-. /opt/ros/noetic/setup.sh
-catkin_init_workspace
-
-# Clone your favourite branch of this repository
-cd ~/overlay/work/catkin_ws/src
-git clone -b feature/multiple_objects --recursive git@github.com:axkoenig/grasp_refinement.git 
-cd ~/overlay/work/catkin_ws
-catkin_make
-
-# To test if everything works
-. ~/overlay/work/catkin_ws/devel/setup.sh
-roslaunch description reflex.launch gui:=false
-
-``` 
-
-To train on the cluster.
-
-```bash
-.cluster/experiments.sh -n 1   # start experiments
-squeue -u akoenig              # viel all jobs
-scancel -u akoenig             # cancel all jobs
-screen -r       # reattach to screen
-``` 
-
-Download data from cluster
-```bash
-cd ~/cluster_logs 
-sudo sftp akoenig@login.rc.fas.harvard.edu
-cd /n/holyscratch01/howe_lab_seas/Users/akoenig/output/agents/logs/refinement/
-get -r 11*
-``` 
-
-
-## Install Software 
-1. Install Gazebo 11 with the DART 6 physics engine (DART has proven to work better at simulating grasping than the default physics engine (ODE)). You will need to build Gazebo from source to work with DART. Follow the [official instructions](http://gazebosim.org/tutorials?tut=install_from_source&cat=install) for doing so.
-
-2. Install ROS noetic by following the [official instructions](https://wiki.ros.org/noetic/Installation/Ubuntu). The ```ros-noetic-desktop``` is recommended. The ```ros-noetic-desktop-full``` would also install Gazebo and this might conflict with the installation from step 1. 
-
-3. Install ROS controllers for robot control and the Gazebo ROS integration.
-```bash
-sudo apt-get install ros-noetic-ros-control ros-noetic-ros-controllers
-sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control
-``` 
-
-4. Setup new catkin workspace.
-
-```bash
+```bash 
+# Init new catkin workspace
 mkdir ~/catkin_ws/src -p
 cd ~/catkin_ws/src
 catkin_init_workspace
+# Clone this repository with its submodules
+git clone --recursive https://github.com/axkoenig/reflex_stack.git
 ```
 
-5. Clone repository with its submodules into ```src``` folder.
-
-```bash
-git clone --recursive https://github.com/axkoenig/grasp_refinement.git
+3. The Reflex Stack was built and tested using Gazebo 11 and DART 6. To run Gazebo with the DART physics engine, you must build Gazebo from source. Running the shell script does this for you. 
+```bash 
+cd ~/catkin_ws/src/reflex_stack/shell
+sudo ./install_gazebo_dart.sh
 ```
-
-6. Build workspace.
-
-```bash
+4. Now that you have all the required dependencies you can install the Reflex Stack. 
+```bash 
+# Build Reflex Stack 
 cd ~/catkin_ws
 catkin_make
-```
-
-7. Source this workspace and, if you like, add it to your ```.bashrc```.
-
-```bash
+# Source workspace and add to your bashrc
 source ~/catkin_ws/devel/setup.bash
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+```
+5. Check if everything works by firing up the simulation in a new terminal.
+```bash 
+roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ```
 
 ## Acknowledgements
 
-- The robot description package was originally based on the ```ll4ma_robots_description``` package by the [Utah Learning Lab for Manipulation Autonomy](https://bitbucket.org/robot-learning/ll4ma_robots_description/src/main/). The parts that were unnecessary for this project were removed. The Reflex robotic hand was also modified to allow for basic actuation of the distal flexure.
-- Developer of [teleop_twist_keyboard.cpp](https://github.com/methylDragon/teleop_twist_keyboard_cpp/blob/master/src/teleop_twist_keyboard.cpp) for making code of non-blocking keyboard input public. Used in my keyboard teleoperation node. 
+- The robot description package was initially based on the ```ll4ma_robots_description``` package by the [Utah Learning Lab for Manipulation Autonomy](https://bitbucket.org/robot-learning/ll4ma_robots_description/src/main/).
+- The keyboard teleoperation node contains some code for non-blocking keyboard input from [teleop_twist_keyboard.cpp](https://github.com/methylDragon/teleop_twist_keyboard_cpp/blob/master/src/teleop_twist_keyboard.cpp). 
