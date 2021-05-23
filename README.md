@@ -48,8 +48,7 @@ If you want to work with the Gazebo GUI follow these steps and you can view it i
 docker-compose up
 localhost:8080/vnc.html # type this in your browser 
 ```
-<img src="docs/docker
-.png"/>
+<img src="docs/docker.png"/>
 
 Note that if you have gzclient installed locally you can follow [this](https://registry.hub.docker.com/_/gazebo) tutorial and check [this](https://www.youtube.com/watch?v=P__phnA57LM) video (which will probably give you a smoother rendering). If you are running the container on Ubuntu check out [this](http://wiki.ros.org/docker/Tutorials/Hardware%20Acceleration) tutorial for hardware acceleration. 
 
