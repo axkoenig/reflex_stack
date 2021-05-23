@@ -92,7 +92,7 @@
       <visual>
         <origin xyz="-0.011 0.007 0.011" rpy="${pi} 0 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/proximal.STL"/>
+          <mesh filename="${mesh_path}/proximal.stl"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -105,7 +105,7 @@
         <collision>
           <origin xyz="-0.011 0.007 0.011" rpy="${pi} 0 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/proximal_coll.STL"/>
+            <mesh filename="${mesh_path}/proximal_coll.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -122,7 +122,7 @@
       <visual>
         <origin xyz="${-0.077-flex_link_box_x/2} 0.007 ${0.007+flex_link_box_z/2+0.004+flex_z_offset}" rpy="${pi} 0 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/distal.STL"/>
+          <mesh filename="${mesh_path}/distal.stl"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -135,7 +135,7 @@
         <collision>
           <origin xyz="${-0.077-flex_link_box_x/2} 0.007 ${0.007+flex_link_box_z/2}" rpy="${pi} 0 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/distal_coll.STL"/>
+            <mesh filename="${mesh_path}/distal_coll.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -151,7 +151,7 @@
       <visual>
         <origin xyz="-0.008 0.014 -0.002" rpy="${pi/2} ${pi/2} 0" />
         <geometry>
-          <mesh filename="${mesh_path}/proximal_pad.STL"/>
+          <mesh filename="${mesh_path}/proximal_pad.stl"/>
         </geometry>
         <material name="dark_grey"/>
       </visual>
@@ -164,7 +164,7 @@
         <xacro:unless value="$(arg simplify_collisions)">
           <origin xyz="-0.008 0.014 -0.002" rpy="${pi/2} ${pi/2} 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/proximal_pad_coll.STL"/>
+            <mesh filename="${mesh_path}/proximal_pad_coll.stl"/>
           </geometry>
         </xacro:unless>
         <xacro:if value="$(arg simplify_collisions)">
@@ -187,7 +187,7 @@
         <!-- setting these xyz values by eye as transformations get too complex -->
         <origin xyz="-0.008 0.0155 0.076" rpy="${pi/2} ${pi/2} 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/distal_pad.STL"/>
+          <mesh filename="${mesh_path}/distal_pad.stl"/>
         </geometry>
         <material name="dark_grey"/>
       </visual>
@@ -200,7 +200,7 @@
         <xacro:unless value="$(arg simplify_collisions)">
           <origin xyz="-0.008 0.0155 0.076" rpy="${pi/2} ${pi/2} 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/distal_pad_coll.STL"/>
+            <mesh filename="${mesh_path}/distal_pad_coll.stl"/>
           </geometry>
         </xacro:unless>
         <xacro:if value="$(arg simplify_collisions)">
@@ -223,7 +223,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/swivel_${finger_id}.STL"/>
+          <mesh filename="${mesh_path}/swivel_${finger_id}.stl"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -236,7 +236,7 @@
         <collision>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/swivel_${finger_id}_coll.STL"/>
+            <mesh filename="${mesh_path}/swivel_${finger_id}_coll.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -254,7 +254,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/base_link.STL"/>
+          <mesh filename="${mesh_path}/base_link.stl"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -267,7 +267,7 @@
         <collision>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/base_link_coll.STL"/>
+            <mesh filename="${mesh_path}/base_link_coll.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -283,7 +283,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="${mesh_path}/pad.STL"/>
+          <mesh filename="${mesh_path}/pad.stl"/>
         </geometry>
         <material name="dark_grey"/>
       </visual>
@@ -296,7 +296,7 @@
         <xacro:unless value="$(arg simplify_collisions)">
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <geometry>
-            <mesh filename="${mesh_path}/pad_coll.STL"/>
+            <mesh filename="${mesh_path}/pad_coll.stl"/>
           </geometry>
         </xacro:unless>
         <xacro:if value="$(arg simplify_collisions)">
