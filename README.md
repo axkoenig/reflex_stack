@@ -15,39 +15,54 @@ This repository contains a simulator for Reflex TakkTile robotic hand and the Re
 
 ## Installation
 
-### Using Docker
+### Option 1: Using Docker
 
-**Setup Option 1**: If you simply want to try this software out you can download the pre-built image from Dockerhub and get going directly. 
-```bash 
-```
-
-**Setup Option 2**: If you want to modify or extend this software you should build it yourself with the included Dockerfile (this may take a while ...). 
+**Build the Container**: If you simply want to try this software out you can download the pre-built image from Dockerhub and skip this step. If you want to modify or extend this software you must build it yourself with the included Dockerfile (this may take a while ...). 
 
 ```bash 
 git clone --recursive https://github.com/axkoenig/reflex_stack.git
 cd reflex_stack
-docker build -t reflex_stack .
+docker build -t axkoenig/reflex_stack .
 ```
 
 **Running the Container** 
 
-Check if everything works by starting the running the container and shelling into it. 
+Check if everything works by running the container and shelling into it. 
 ```bash
-docker run --name sim -it reflex_stack      # start simulation container
-docker exec -it sim bash -l                 # shell into container from a new terminal
-rostopic echo /reflex_interface/hand_state  # check if everything works
+docker run --name sim -it axkoenig/reflex_stack     # start simulation container
+docker exec -it sim bash -l                         # shell into container from a new terminal
+rostopic echo /reflex_interface/hand_state          # check if everything works
 ```
 
-If you want to run multiple simulations on one computer just make sure that you have no ports overlap. You can specifiy the ports like this.  
+If you want to run multiple simulations on one computer just make sure that no ports overlap. You can specifiy the ports like this.  
 ```bash
 # first simulation 
-docker run --name sim_1 -it reflex_stack --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=http://localhost:11321 
+docker run --name sim_1 -it axkoenig/reflex_stack --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=http://localhost:11321 
 # second simulation 
-docker run --name sim_2 -it reflex_stack --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=http://localhost:11322 
+docker run --name sim_2 -it axkoenig/reflex_stack --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=http://localhost:11322 
 ```
 
-### Using plain Ubuntu
-0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04. You may want to run all this in a Docker container to avoid version conflicts. 
+**Visualizing Simulation**
+If you want to work with the Gazebo GUI follow these steps and you can view it in your browser.
+```bash
+docker-compose up
+localhost:8080/vnc.html # type this in your browser 
+```
+<img src="docs/docker
+.png"/>
+
+Note that if you have gzclient installed locally you can follow [this](https://registry.hub.docker.com/_/gazebo) tutorial and check [this](https://www.youtube.com/watch?v=P__phnA57LM) video (which will probably give you a smoother rendering). If you are running the container on Ubuntu check out [this](http://wiki.ros.org/docker/Tutorials/Hardware%20Acceleration) tutorial for hardware acceleration. 
+
+**Interacting with Simulation**
+If you want to teleoperate the robotic hand you can fire up the keyboard teleoperation node in a separate terminal. 
+
+```bash
+docker exec -it sim bash -l
+rosrun reflex_interface finger_teleop_node
+```
+
+### Option 2: Using plain Ubuntu
+0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04.
 1. Install ROS Noetic by following [these](http://wiki.ros.org/noetic/Installation/Ubuntu) steps.
 2. Clone this repository into a new catkin workspace.
 
