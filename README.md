@@ -29,24 +29,24 @@ docker build -t axkoenig/reflex_stack .
 
 Check if everything works by running the container and shelling into it. 
 ```bash
-docker run --name sim -it axkoenig/reflex_stack     # start simulation container
-docker exec -it sim bash -l                         # shell into container from a new terminal
-rostopic echo /reflex_interface/hand_state          # check if everything works
+docker run --name sim -it --rm axkoenig/reflex_stack    # start simulation container
+docker exec -it sim bash -l                             # shell into container from a new terminal
+rostopic echo /reflex_interface/hand_state              # check if everything works
 ```
 
 If you want to run multiple simulations on one computer just make sure that no ports overlap. You can specifiy the ports like this.  
 ```bash
 # first simulation 
-docker run --name sim_1 -it axkoenig/reflex_stack --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=http://localhost:11321 
+docker run --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=http://localhost:11321 --name sim_1 -it --rm axkoenig/reflex_stack
 # second simulation 
-docker run --name sim_2 -it axkoenig/reflex_stack --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=http://localhost:11322 
+docker run --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=http://localhost:11322 --name sim_2 -it --rm axkoenig/reflex_stack
 ```
 
 **Visualizing Simulation**
 If you want to work with the Gazebo GUI follow these steps and you can view it in your browser.
 ```bash
-docker-compose up
-localhost:8080/vnc.html # type this in your browser 
+docker-compose run --rm reflex_stack    # removes reflex_stack container after execution
+localhost:8080/vnc.html                 # type this in your browser 
 ```
 <img src="docs/docker.png"/>
 
@@ -92,6 +92,31 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```bash 
 roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ```
+
+## Keyboard Teleoperation
+
+Here are all commands you can do using your keyboard. You can change the key bindings in the [keyboard_teleop.cpp](reflex_interface/src/reflex_interface/keyboard_teleop.cpp) file. You can also use they keyboard teleoperation node on the real hand. Some commands (such as spherical close) are disabled on the real hand as fingers would crash into each other.
+
+| Key | Effect              |
+|-----|---------------------|
+| u/U | wrist x +/-         |
+| i/I | wrist y +/-         |
+| o/O | wrist z +/-         |
+| j/J | wrist roll +/-      |
+| k/K | wrist pitch +/-     |
+| l/L | wrist yaw +/-       |
+| m   | reset wrist pose    |
+| q/Q | finger 1 +/-        |
+| w/W | finger 2 +/-        |
+| e/E | finger 3 +/-        |
+| r/R | preshape +/-        |
+| y   | pinch               |
+| x   | open                |
+| c   | close               |
+| v   | spherical open      |
+| b   | spherical close     |
+| n   | close until contact |
+| t   | tighten grasp       |
 
 ## Acknowledgements
 
