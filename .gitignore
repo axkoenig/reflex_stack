@@ -1,5 +1,7 @@
 # ignore singularity images 
 *.img
+# ignore output of docker containers
+output
 
 devel/
 logs/
