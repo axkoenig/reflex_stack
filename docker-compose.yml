@@ -11,6 +11,8 @@ services:
       - novnc
     networks:
       - x11
+    volumes:
+      - ./output:/root/.ros/log
   novnc:
     image: theasp/novnc:latest
     environment:
