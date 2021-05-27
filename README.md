@@ -45,7 +45,7 @@ docker run --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=h
 **Visualizing Simulation**
 If you want to work with the Gazebo GUI follow these steps and you can view it in your browser.
 ```bash
-docker-compose run --rm reflex_stack    # removes reflex_stack container after execution
+docker-compose up
 localhost:8080/vnc.html                 # type this in your browser 
 ```
 <img src="docs/docker.png"/>
