@@ -9,6 +9,7 @@ class ReflexMotor
 public:
     virtual float getAngle() { return 0.0; }
     virtual float getVelocity() { return 0.0; }
+    virtual float getLoad() { return 0.0; }
 };
 
 class ReflexFingerMotor : public ReflexMotor
@@ -29,6 +30,10 @@ private:
     float proximal_to_flex_vel = 0.0;
     float flex_to_distal_vel = 0.0;
 
+    float proximal_load = 0.0;
+    float proximal_to_flex_load = 0.0;
+    float flex_to_distal_load = 0.0;
+
 public:
     ReflexFingerMotor(int finger_id);
     void proximal_callback(const control_msgs::JointControllerState &msg);
@@ -36,6 +41,7 @@ public:
     void flex_to_distal_callback(const control_msgs::JointControllerState &msg);
     virtual float getAngle() override;
     virtual float getVelocity() override;
+    virtual float getLoad() override;
 };
 
 class ReflexPreshapeMotor : public ReflexMotor
@@ -51,6 +57,8 @@ private:
     float preshape_2_angle = 0.0;
     float preshape_1_vel = 0.0;
     float preshape_2_vel = 0.0;
+    float preshape_1_load = 0.0;
+    float preshape_2_load = 0.0;
 
 public:
     ReflexPreshapeMotor();
@@ -58,6 +66,7 @@ public:
     void preshape_2_callback(const control_msgs::JointControllerState &msg);
     virtual float getAngle() override;
     virtual float getVelocity() override;
+    virtual float getLoad() override;
 };
 
 #endif

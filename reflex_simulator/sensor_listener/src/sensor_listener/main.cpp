@@ -53,6 +53,7 @@ int main(int argc, char **argv)
         {
             hand_msg.motor[i].joint_angle = hand.motors[i]->getAngle();
             hand_msg.motor[i].velocity = hand.motors[i]->getVelocity();
+            hand_msg.motor[i].load = hand.motors[i]->getLoad();
         }
 
         // add palm info to contact frames message
