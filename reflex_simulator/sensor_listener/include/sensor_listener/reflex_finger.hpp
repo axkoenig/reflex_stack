@@ -48,7 +48,8 @@ private:
                                 const int &num_sensors_on_link,
                                 const float sensor_boundaries[],
                                 const tf2::Transform &world_to_link,
-                                const tf2::Vector3 &link_to_pad_origin);
+                                const tf2::Vector3 &link_to_pad_origin,
+                                bool verbose = false);
     void proximal_callback(const control_msgs::JointControllerState &msg);
     void proximal_to_flex_callback(const control_msgs::JointControllerState &msg);
     void flex_to_distal_callback(const control_msgs::JointControllerState &msg);
