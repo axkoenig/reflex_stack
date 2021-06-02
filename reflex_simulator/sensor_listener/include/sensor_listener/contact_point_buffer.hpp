@@ -17,10 +17,10 @@ public:
 class ContactPointBuffer
 {
 public:
-    float merge_contacts_dist = 0.0001; // the data in the vectors comes from contact points that are at most 1/10mm apart
     std::vector<SimContactResult> results;
 
     SimContactResult get_averaged_results();
+    SimContactResult get_force_weighted_averaged_results();
 };
 
 #endif
