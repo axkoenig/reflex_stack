@@ -29,9 +29,9 @@ docker build -t axkoenig/reflex_stack .
 
 Check if everything works by running the container and shelling into it. 
 ```bash
-docker run --name sim -it --rm axkoenig/reflex_stack    # start simulation container
-docker exec -it sim bash -l                             # shell into container from a new terminal
-rostopic echo /reflex_interface/hand_state              # check if everything works
+docker run --name sim -it --rm axkoenig/reflex_stack    # in terminal 1: start simulation container
+docker exec -it sim bash -l                             # in terminal 2: shell into container
+rostopic echo /reflex_interface/hand_state              # in terminal 2: print out reflex hand state
 ```
 
 If you want to run multiple simulations on one computer just make sure that no ports overlap. You can specifiy the ports like this.  
