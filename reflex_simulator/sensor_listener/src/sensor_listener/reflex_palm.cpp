@@ -103,7 +103,7 @@ void ReflexPalm::contacts_callback(const gazebo_msgs::ContactsState &msg)
 
     // fill remaining message
     cf_msg.sensor_id = 0;
-    cf_msg.finger_id = 0;
+    cf_msg.hand_part_id = 0;
     cf_msg.palm_contact = true;
     cf_msg.prox_contact = false;
     cf_msg.dist_contact = false;

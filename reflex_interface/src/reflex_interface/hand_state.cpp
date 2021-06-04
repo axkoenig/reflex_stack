@@ -82,7 +82,7 @@ void HandState::sim_state_callback(const sensor_listener::ContactFrames &msg)
         vars.contact_force_magnitudes.push_back(msg.contact_frames[i].contact_force_magnitude);
         vars.contact_torque_magnitudes.push_back(msg.contact_frames[i].contact_torque_magnitude);
         vars.sum_contact_forces += msg.contact_frames[i].contact_force_magnitude;
-        int finger_id = msg.contact_frames[i].finger_id;
+        int finger_id = msg.contact_frames[i].hand_part_id;
         vars.link_ids.push_back(finger_id);
         if (!msg.contact_frames[i].palm_contact)
         {

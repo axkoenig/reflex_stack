@@ -235,8 +235,8 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
 
     // fill message
     sensor_listener::ContactFrame cf_msg;
-    cf_msg.sensor_id = first_sensor_idx + sensor_id + 1; // ranges from 1 to 9
-    cf_msg.finger_id = finger_id;                        // ranges from 1 to 3
+    cf_msg.sensor_id = first_sensor_idx + sensor_id + 1;    // ranges from 1 to 9
+    cf_msg.hand_part_id = finger_id;                        // ranges from 1 to 3
     cf_msg.palm_contact = false;
     cf_msg.prox_contact = true ? first_sensor_idx == 0 : false;
     cf_msg.dist_contact = true ? first_sensor_idx == 5 : false;
