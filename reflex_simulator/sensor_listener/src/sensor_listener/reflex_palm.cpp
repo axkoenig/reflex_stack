@@ -54,8 +54,8 @@ void ReflexPalm::contacts_callback(const gazebo_msgs::ContactsState &msg)
             }
 
             // transform contact position from world frame to pad origin
-            tf2::Vector3 contact_position = create_vec_from_msg(msg.states[j].contact_positions[i]);
-            tf2::Vector3 contact_position_on_pad = pad_to_world * contact_position;
+            scr.position = create_vec_from_msg(msg.states[j].contact_positions[i]);
+            tf2::Vector3 contact_position_on_pad = pad_to_world * scr.position;
 
             // stop if contact on back of palm
             if (contact_position_on_pad[1] < 0.0)
