@@ -67,24 +67,24 @@ void HandState::sim_state_callback(const sensor_listener::ContactFrames &msg)
     // reset variables
     mtx.lock();
     vars.clear_all();
-    vars.num_contacts = msg.contact_frames.size();
+    vars.num_contacts = msg.contact_frames_world.size();
 
     for (int i = 0; i < vars.num_contacts; i++)
     {
         tf2::Transform transform;
-        tf2::fromMsg(msg.contact_frames[i].contact_frame, transform);
+        tf2::fromMsg(msg.contact_frames_world[i].contact_frame, transform);
         vars.contact_frames.push_back(transform);
-        vars.contact_forces.push_back(create_vec_from_msg(msg.contact_frames[i].contact_wrench.force));
-        vars.contact_torques.push_back(create_vec_from_msg(msg.contact_frames[i].contact_wrench.torque));
-        vars.contact_positions.push_back(create_vec_from_msg(msg.contact_frames[i].contact_position));
-        vars.contact_normals.push_back(create_vec_from_msg(msg.contact_frames[i].contact_normal));
-        vars.sensor_ids.push_back(msg.contact_frames[i].sensor_id);
-        vars.contact_force_magnitudes.push_back(msg.contact_frames[i].contact_force_magnitude);
-        vars.contact_torque_magnitudes.push_back(msg.contact_frames[i].contact_torque_magnitude);
-        vars.sum_contact_forces += msg.contact_frames[i].contact_force_magnitude;
-        int finger_id = msg.contact_frames[i].hand_part_id;
+        vars.contact_forces.push_back(create_vec_from_msg(msg.contact_frames_world[i].contact_wrench.force));
+        vars.contact_torques.push_back(create_vec_from_msg(msg.contact_frames_world[i].contact_wrench.torque));
+        vars.contact_positions.push_back(create_vec_from_msg(msg.contact_frames_world[i].contact_position));
+        vars.contact_normals.push_back(create_vec_from_msg(msg.contact_frames_world[i].contact_normal));
+        vars.sensor_ids.push_back(msg.contact_frames_world[i].sensor_id);
+        vars.contact_force_magnitudes.push_back(msg.contact_frames_world[i].contact_force_magnitude);
+        vars.contact_torque_magnitudes.push_back(msg.contact_frames_world[i].contact_torque_magnitude);
+        vars.sum_contact_forces += msg.contact_frames_world[i].contact_force_magnitude;
+        int finger_id = msg.contact_frames_world[i].hand_part_id;
         vars.link_ids.push_back(finger_id);
-        if (!msg.contact_frames[i].palm_contact)
+        if (!msg.contact_frames_world[i].palm_contact)
         {
             // this should never happen but checking anyway due to vector accessing below
             if (finger_id < 1 || finger_id > 3)

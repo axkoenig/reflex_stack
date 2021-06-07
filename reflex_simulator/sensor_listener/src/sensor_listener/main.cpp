@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include <reflex_msgs/Hand.h>
 
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 #include "sensor_listener/ContactFrames.h"
 #include "sensor_listener/reflex_hand.hpp"
 #include "gazebo_interface/gazebo_interface.hpp"
@@ -44,8 +46,8 @@ int main(int argc, char **argv)
             }
 
             // fill contact frames message with prox and distal contacts
-            cfs_msg.contact_frames.insert(cfs_msg.contact_frames.end(), hand.fingers[i].prox_contact_frames.begin(), hand.fingers[i].prox_contact_frames.end());
-            cfs_msg.contact_frames.insert(cfs_msg.contact_frames.end(), hand.fingers[i].dist_contact_frames.begin(), hand.fingers[i].dist_contact_frames.end());
+            cfs_msg.contact_frames_world.insert(cfs_msg.contact_frames_world.end(), hand.fingers[i].prox_contact_frames.begin(), hand.fingers[i].prox_contact_frames.end());
+            cfs_msg.contact_frames_world.insert(cfs_msg.contact_frames_world.end(), hand.fingers[i].dist_contact_frames.begin(), hand.fingers[i].dist_contact_frames.end());
         }
 
         // iterate over motors
@@ -57,10 +59,34 @@ int main(int argc, char **argv)
         }
 
         // add palm info to contact frames message
-        cfs_msg.contact_frames.insert(cfs_msg.contact_frames.end(), hand.palm.contact_frames.begin(), hand.palm.contact_frames.end());
-        cfs_msg.num_contact_frames = cfs_msg.contact_frames.size();
+        cfs_msg.contact_frames_world.insert(cfs_msg.contact_frames_world.end(), hand.palm.contact_frames.begin(), hand.palm.contact_frames.end());
+        cfs_msg.num_contact_frames = cfs_msg.contact_frames_world.size();
 
-        cfs_msg.header.frame_id = "world";
+        // copy info over and transform to shell frame
+        cfs_msg.contact_frames_shell = cfs_msg.contact_frames_world;
+        tf2::Transform world_to_shell = getLinkPoseSim(&nh, "shell", "world", false);
+        tf2::Transform shell_to_world = world_to_shell.inverse();
+
+        for (int i = 0; i < cfs_msg.num_contact_frames; i++)
+        {
+            // this info must be transformed (i.e. translation and rotation )
+            tf2::Vector3 vec;
+            tf2::Transform frame;
+            tf2::fromMsg(cfs_msg.contact_frames_shell[i].contact_position, vec);
+            tf2::fromMsg(cfs_msg.contact_frames_shell[i].contact_frame, frame);
+            cfs_msg.contact_frames_shell[i].contact_position = tf2::toMsg(shell_to_world * vec);
+            cfs_msg.contact_frames_shell[i].contact_frame = tf2::toMsg(shell_to_world * frame);
+
+            // this info must only be rotated
+            shell_to_world.setOrigin(tf2::Vector3(0, 0, 0));
+            tf2::fromMsg(cfs_msg.contact_frames_shell[i].contact_normal, vec);
+            cfs_msg.contact_frames_shell[i].contact_normal = tf2::toMsg(shell_to_world * vec);
+            tf2::fromMsg(cfs_msg.contact_frames_shell[i].contact_wrench.force, vec);
+            cfs_msg.contact_frames_shell[i].contact_wrench.force = tf2::toMsg(shell_to_world * vec);
+            tf2::fromMsg(cfs_msg.contact_frames_shell[i].contact_wrench.torque, vec);
+            cfs_msg.contact_frames_shell[i].contact_wrench.torque = tf2::toMsg(shell_to_world * vec);
+        }
+
         cfs_msg.header.stamp = ros::Time::now();
 
         hand_pub.publish(hand_msg);
