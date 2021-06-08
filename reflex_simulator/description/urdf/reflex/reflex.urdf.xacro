@@ -16,7 +16,7 @@
   </xacro:unless>
 
   <xacro:property name="pi" value="3.14159265359" />
-  <xacro:property name="mesh_path" value="package://description/meshes/reflex"/>
+  <xacro:property name="mesh_path" value="$(find description)/meshes/reflex"/>
 
   <xacro:include filename="$(find description)/urdf/xacro_macros/inertia_tensors.xacro"/>
 
