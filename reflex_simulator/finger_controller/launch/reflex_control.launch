@@ -20,6 +20,6 @@
     " launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' "/>
 
   <!-- launch finger finger_controller -->
-  <node pkg="finger_controller" type="finger_controller_node" name="finger_controller_node" respawn="true" output="screen" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' "/>
+  <node pkg="finger_controller" type="finger_controller_node" name="finger_controller_node" respawn="false" output="screen" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' "/>
 
 </launch>
