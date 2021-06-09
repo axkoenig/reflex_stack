@@ -8,12 +8,13 @@
     <arg name="run_reflex_interface_node" default="true" />
     <arg name="launch_finger_controllers" default="true" />
     <arg name="base_link_name" default="shell" />
+    <arg name="spawn_new_world" default="true" />
 
     <!-- this is a parameter on real reflex which we simulate: any sensor pressure below the threshold will not be reported as a contact 
          the param is necessary on real hand because sensors are noisy and usually report pressures \in [-3,3] if there is no contact. -->
     <arg name="default_contact_threshold" default="5" />
     <param name="default_contact_threshold" value="$(arg default_contact_threshold)" />
-	
+
     <!-- grasp and object poses -->
     <rosparam file="$(find description)/config/grasp_poses.yaml"/>
 
@@ -51,7 +52,7 @@
     <arg name="world_name" default="$(find description)/worlds/reflex.world" />
 
     <!-- include gazebo_ros launcher -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg spawn_new_world)">
         <arg name="world_name" value="$(arg world_name)" />
         <arg name="debug" value="$(arg debug)" />
         <arg name="gui" value="$(arg gui)" />
@@ -65,7 +66,6 @@
     <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
         <arg name="object_name" value="$(arg object_name)"/>
     </include>
-
     <param name="robot_description" command="
         $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name) reflex_pub_rate:=$(arg reflex_pub_rate) simplify_collisions:=$(arg simplify_collisions)"/>
 
@@ -74,7 +74,7 @@
          TODO check if this is really a Gazebo bug or if we can treat this in a nicer way ...-->
     <arg name="reflex_spawn_delay" default="2" />
     <arg name="nodes_spawn_delay" default="4" />
-    
+
     <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
 
     <!-- Keyboard teleoperation node for wrist and fingers-->
@@ -88,7 +88,7 @@
 
     <!-- Launch controllers -->
     <group if="$(arg launch_finger_controllers)">
-        <include file="$(find finger_controller)/launch/reflex_control.launch">
+        <include file="$(find finger_controller)/launch/finger_controller.launch">
             <arg name="spawn_delay" value="$(arg nodes_spawn_delay)" />
         </include>
     </group>
