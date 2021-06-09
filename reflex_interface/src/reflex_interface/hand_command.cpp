@@ -60,18 +60,18 @@ std::string HandCommand::getStatusMsg()
 void HandCommand::sim_state_callback(const sensor_listener::ContactFrames &msg)
 {
     fingers_in_contact = {0, 0, 0};
-    for (int i = 0; i < int(msg.contact_frames.size()); i++)
+    for (int i = 0; i < int(msg.contact_frames_world.size()); i++)
     {
-        int finger_id = msg.contact_frames[i].finger_id;
-        if (!msg.contact_frames[i].palm_contact)
+        int hand_part_id = msg.contact_frames_world[i].hand_part_id;
+        if (!msg.contact_frames_world[i].palm_contact)
         {
             // this should never happen but checking anyway due to vector accessing below
-            if (finger_id < 1 || finger_id > 3)
+            if (hand_part_id < 1 || hand_part_id > 3)
             {
                 ROS_ERROR("Your finger id is out of bounds. Ignoring this.");
                 continue;
             }
-            fingers_in_contact[finger_id - 1] = true;
+            fingers_in_contact[hand_part_id - 1] = true;
         }
     }
 }
