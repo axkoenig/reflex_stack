@@ -27,4 +27,10 @@
 	     izz="${(1.0 / 2.0) * m * (r * r)}"/>
   </xacro:macro>
   
+  <xacro:macro name="cylinder_inertia_mod" params="m r h scaling_factor">
+    <inertia ixx="${(scaling_factor / 12.0) * m * (3 * r * r + h * h)}" ixy="0.0" ixz="0.0" 
+	     iyy="${(scaling_factor / 12.0) * m * (3 * r * r + h * h)}" iyz="0.0" 
+	     izz="${(scaling_factor / 2.0) * m * (r * r)}"/>
+  </xacro:macro>
+  
 </robot>

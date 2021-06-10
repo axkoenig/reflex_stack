@@ -6,6 +6,9 @@
     <xacro:arg name="cylinder_radius" default="0.04"/>
     <xacro:arg name="cylinder_length" default="0.15"/>
 
+    <!-- inertia_scaling_factor = 1 means ground truth as calculated by formula -->
+    <xacro:arg name="inertia_scaling_factor" default="1"/>
+
     <xacro:property name="link_name" value="cylinder_link"/>
 
     <xacro:include filename="$(find description)/urdf/xacro_macros/inertia_tensors.xacro"/>
@@ -26,7 +29,7 @@
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <mass value="$(arg cylinder_mass)"/>
-            <xacro:cylinder_inertia m="$(arg cylinder_mass)" r="$(arg cylinder_radius)" h="$(arg cylinder_length)"/>
+            <xacro:cylinder_inertia_mod m="$(arg cylinder_mass)" r="$(arg cylinder_radius)" h="$(arg cylinder_length)" scaling_factor="$(arg inertia_scaling_factor)"/>
         </inertial>
     </link>
 

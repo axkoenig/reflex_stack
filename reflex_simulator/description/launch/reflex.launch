@@ -65,6 +65,7 @@
     <!-- spawning objects here first (before spawning reflex) -->
     <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
         <arg name="object_name" value="$(arg object_name)"/>
+        <arg name="inertia_scaling_factor" value="0.9"/>
     </include>
     <param name="robot_description" command="
         $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name) reflex_pub_rate:=$(arg reflex_pub_rate) simplify_collisions:=$(arg simplify_collisions)"/>
