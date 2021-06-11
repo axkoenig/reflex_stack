@@ -36,7 +36,7 @@ RUN apt-get -y install ros-noetic-ros-control \
     ros-noetic-gazebo-ros-control
 
 # init catkin workspace, copy Reflex Stack over and build it
-ENV CATKIN_WS=/root/catkin_ws
+ENV CATKIN_WS=/home/catkin_ws
 RUN mkdir ${CATKIN_WS}/src -p \
     && cd ${CATKIN_WS}/src \
     && /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_init_workspace'

@@ -4,7 +4,7 @@ services:
     image: axkoenig/reflex_stack:latest
     build: .
     container_name: sim
-    command: /bin/bash -c "source /root/catkin_ws/devel/setup.bash; roslaunch description reflex.launch gui:=true"
+    command: /bin/bash -c "source /home/catkin_ws/devel/setup.bash; roslaunch description reflex.launch gui:=true"
     environment:
       - DISPLAY=novnc:0.0
     depends_on:
@@ -12,7 +12,7 @@ services:
     networks:
       - x11
     volumes:
-      - ./output:/root/.ros/log
+      - ./output:/home/.ros/log
   novnc:
     image: theasp/novnc:latest
     environment:
