@@ -92,6 +92,70 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```bash 
 roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ```
+### Option 3: Using Singularity on a Research Cluster
+
+<details>
+<summary>Running Reflex Stack on a Research Cluster</summary>
+
+You may want to run the Reflex Stack on a cluster to spawn multiple simulations at once. Most research clusters use Singularity on their systems instead of Docker. You can find an in-depth user guide on Singularity [here](https://sylabs.io/guides/3.7/user-guide/). Luckily, [Singularity is tightly integrated with Docker](https://sylabs.io/guides/3.7/user-guide/singularity_and_docker.html). Hence, the easiest way to run the Reflex Stack through Singularity on a cluster is by using its publicly available Docker image. 
+
+```bash 
+# login to your cluster
+ssh username@hostname 
+# start an interactive slurm session (singularity is usually not available on the login nodes)
+salloc -n 1 -c 4 -N 1 --mem 16000 -t 0-04:00 --partition serial_requeue
+# run simulation (reflex_stack will be downloaded the first time you run this)
+singularity run docker://axkoenig/reflex_stack
+```
+
+You should see the simulation running now. If you want to interface with the simulation and run your custom controllers this is my usual workflow. 
+```bash 
+# (1) start an instance of the simulation 
+screen
+singularity run docker://axkoenig/reflex_stack
+# press Ctrl+a, d on keyboard to detach and leave simulation running
+# (2) interface with the simulation
+singularity exec docker://axkoenig/reflex_stack bash
+source ${CATKIN_WS}/devel/setup.bash
+rostopic echo /reflex_takktile/hand_state # you can run your custom ROS code here (e.g. "python controller.py")
+```
+
+</details>
+
+<details>
+<summary>Modifying Reflex Stack and run it on a Research Cluster</summary>
+
+You may want to modify the Reflex Stack and run your custom version of it on your cluster. Usually you don't have `sudo` permissions on research clusters, so you'll need to build the image with your modified Reflex Stack on your local machine and then push it to your cluster (`sudo` rights are required to run the `singularity build` command). You have three options: (1) You build a new Docker image from your modified code (like explained above), upload it to Dockerhub and then pull it to the cluster. (2) You locally build a Singularity image from your modified code, upload it to the cluster and run it directly. (3) You can build a Singularity image that only runs ROS and Gazebo (without the Reflex Simulator or RI), push that to the cluster, and once you shell into the image, you can build your modified code with `catkin_make` on the research cluster as usual. Usually options (1) or (2) are fine. I recommend option (3) if you need to update your code frequently, because for option (1) and (2) you will also need to build Gazebo every time which takes a long time.
+
+Here are some instructions for the option (3). 
+```bash 
+# build your gazebo_ros image on your local machine (this doesn't contain the reflex stack!) 
+sudo singularity build gazebo_ros.img gazebo_ros.recipe
+
+# after building your gazebo_ros image, push it to cluster
+sudo sftp usename@hostname
+put -r gazebo_ros.img
+
+# login to cluster
+ssh username@hostname
+# start interactive session to get singularity support
+salloc -n 1 -c 4 -N 1 --mem 16000 -t 0-04:00 --partition serial_requeue
+## A) BUILD REFLEX STACK (YOU ONLY NEED TO DO THIS ONCE)
+# shell into our gazebo_ros image 
+singularity shell gazebo_ros.img
+# create new catkin workspace
+CATKIN_WS=~/catkin_ws
+mkdir ${CATKIN_WS}/src -p && cd ${CATKIN_WS}/src
+. /opt/ros/noetic/setup.bash && catkin_init_workspace
+# clone reflex_stack into src directory 
+git clone --recursive https://github.com/axkoenig/reflex_stack.git
+# build reflex_stack
+cd ${CATKIN_WS}/src && catkin_make
+## B) RUN REFLEX_STACK
+source ${CATKIN_WS}/devel/setup.bash
+roslaunch description reflex.launch gui:=false
+```
+</details>
 
 ## Keyboard Teleoperation
 
