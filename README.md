@@ -150,7 +150,7 @@ mkdir ${CATKIN_WS}/src -p && cd ${CATKIN_WS}/src
 # clone reflex_stack into src directory 
 git clone --recursive https://github.com/axkoenig/reflex_stack.git
 # build reflex_stack
-cd ${CATKIN_WS}/src && catkin_make
+cd ${CATKIN_WS} && catkin_make
 ## B) RUN REFLEX_STACK
 source ${CATKIN_WS}/devel/setup.bash
 roslaunch description reflex.launch gui:=false
