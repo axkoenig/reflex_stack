@@ -141,8 +141,9 @@ ssh username@hostname
 # start interactive session to get singularity support
 salloc -n 1 -c 4 -N 1 --mem 16000 -t 0-04:00 --partition serial_requeue
 ## A) BUILD REFLEX STACK (YOU ONLY NEED TO DO THIS ONCE)
-# shell into our gazebo_ros image 
-singularity shell gazebo_ros.img
+# create an output directory and shell into our gazebo_ros image 
+mkdir output
+singularity shell --bind ./output/:/output gazebo_ros.img
 # create new catkin workspace
 CATKIN_WS=~/catkin_ws
 mkdir ${CATKIN_WS}/src -p && cd ${CATKIN_WS}/src
