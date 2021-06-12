@@ -1,4 +1,5 @@
 #include <math.h>
+#include <numeric>
 
 extern "C"
 {
@@ -431,31 +432,28 @@ float GraspQuality::getSlipMargin(std::vector<tf2::Vector3> &contact_normals,
         return 0;
     }
 
-    float min_delta = 0;
+    std::vector<float> weighted_slip_margins;
+
     for (int i = 0; i < num_contacts; i++)
     {
         // calc measured normal force by scalar projection
         float f_norm_m = contact_forces[i].dot(contact_normals[i].normalize());
-
-        // negative normal force means we lift off (i.e. can't resist tangential forces)
-        if (f_norm_m < 0){
-            continue; 
-        }
         
-        // calc measured tangential force
+        // negative normal force means we lift off (i.e. this contact can't resist tangential forces)
+        if (f_norm_m < 0)
+        {
+            continue;
+        }
+
+        // calc measured tangential force with pythagoras
         float f_tang_m = sqrt(pow(contact_force_magnitudes[i], 2) - pow(f_norm_m, 2));
 
         // calc allowed tangential force using Coulomb
         float f_tang_allow = mu_delta * f_norm_m;
 
-        // calc margin to slip boundary
+        // calc margin to slip boundary and add to vector
         float f_tang_margin = f_tang_allow - f_tang_m;
-
-        // save first or new lowest f_tang_margin
-        if (i == 0 || f_tang_margin < min_delta)
-        {
-            min_delta = f_tang_margin;
-        }
+        weighted_slip_margins.push_back(f_tang_margin * contact_force_magnitudes[i]);
 
         if (verbose)
         {
@@ -469,9 +467,6 @@ float GraspQuality::getSlipMargin(std::vector<tf2::Vector3> &contact_normals,
             ROS_INFO_STREAM("f_tang_margin is " << f_tang_margin);
         }
     }
-    if (verbose)
-    {
-        ROS_INFO_STREAM("==> final min_delta is " << min_delta);
-    }
-    return min_delta;
+    float total_force = std::accumulate(contact_force_magnitudes.begin(), contact_force_magnitudes.end(), 0.0);
+    return std::accumulate(weighted_slip_margins.begin(), weighted_slip_margins.end(), 0.0) / total_force;
 }
