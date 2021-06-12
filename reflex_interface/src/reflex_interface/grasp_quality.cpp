@@ -432,13 +432,19 @@ float GraspQuality::getSlipMargin(std::vector<tf2::Vector3> &contact_normals,
         return 0;
     }
 
+    // we can't resist wrenches if there are no contacts
+    if (!num_contacts)
+    {
+        return 0; 
+    }
+
     std::vector<float> weighted_slip_margins;
 
     for (int i = 0; i < num_contacts; i++)
     {
         // calc measured normal force by scalar projection
         float f_norm_m = contact_forces[i].dot(contact_normals[i].normalize());
-        
+
         // negative normal force means we lift off (i.e. this contact can't resist tangential forces)
         if (f_norm_m < 0)
         {
