@@ -140,7 +140,8 @@ bool HandCommand::waitUntilFinished(float tolerance, float time_out)
             diff[i] = abs(cur_cmd[i] - state->motor_states[i]->getJointAngle());
         }
 
-        if (std::all_of(diff.begin(), diff.end(), [tolerance](float x) { return x < tolerance; }))
+        if (std::all_of(diff.begin(), diff.end(), [tolerance](float x)
+                        { return x < tolerance; }))
         {
             return true;
         }
@@ -201,16 +202,18 @@ bool HandCommand::callbackCloseUntilContact(std_srvs::Trigger::Request &req, std
     ros::Duration allowed_duration(close_until_contact_time_out);
     ros::Time start_time = ros::Time::now();
     // std::vector<bool> fingers_in_contact = {0, 0, 0}; // example: finger 1 in contact {1, 0, 0}
-    std::vector<bool> contact_memory = {0, 0, 0};     // example: finger 1 and 2 were in contact throughout this service call {1, 1, 0}
-    std::vector<bool> contact_or_up_lim = {0, 0, 0};  // example: finger 1 reached upper joint limit and finger 2 in contact {1, 1, 0}
+    std::vector<bool> contact_memory = {0, 0, 0};    // example: finger 1 and 2 were in contact throughout this service call {1, 1, 0}
+    std::vector<bool> contact_or_up_lim = {0, 0, 0}; // example: finger 1 reached upper joint limit and finger 2 in contact {1, 1, 0}
 
     ros::Rate rate(close_until_contact_pub_rate);
 
     while (allowed_duration > (ros::Time::now() - start_time))
     {
         // stop if all fingers have been in contact at least once throughout this service call or if all are currently in contact
-        bool allFingersMadeContact = std::all_of(contact_memory.begin(), contact_memory.end(), [](bool v) { return v; });
-        bool stop_bad = std::all_of(contact_or_up_lim.begin(), contact_or_up_lim.end(), [](bool v) { return v; });
+        bool allFingersMadeContact = std::all_of(contact_memory.begin(), contact_memory.end(), [](bool v)
+                                                 { return v; });
+        bool stop_bad = std::all_of(contact_or_up_lim.begin(), contact_or_up_lim.end(), [](bool v)
+                                    { return v; });
         bool stop_good = allFingersMadeContact || state->allFingersInContact();
 
         if (stop_good)
@@ -281,10 +284,11 @@ bool HandCommand::executePosIncrement(float increment[4], bool from_measured_pos
     std::array<float, 4> cur_state;
     if (from_measured_pos)
     {
+        // TODO maybe add 4th DOF back in state->motor_states[3]->getJointAngle()
         cur_state = {state->motor_states[0]->getJointAngle(),
                      state->motor_states[1]->getJointAngle(),
                      state->motor_states[2]->getJointAngle(),
-                     state->motor_states[3]->getJointAngle()};
+                     0};
     }
     else
     {
