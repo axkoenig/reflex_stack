@@ -13,18 +13,17 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    
-    <!-- using a very flat box as a ground plane which is slightly offset at z axis
-         because simulation is about 4 times faster than with standard ground_plane 
-         anchored in origin. -->
+
+    <!-- this is the standard gazebo ground plane, but with changed friction params -->
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box>
-              <size>10 10 0.01 0 0 0</size>
-            </box>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
           </geometry>
           <surface>
             <friction>
@@ -36,10 +35,12 @@
           </surface>
         </collision>
         <visual name="visual">
+          <cast_shadows>false</cast_shadows>
           <geometry>
-            <box>
-              <size>10 10 0.01 0 0 0</size>
-            </box>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
           </geometry>
           <material>
             <script>
@@ -49,7 +50,6 @@
           </material>
         </visual>
       </link>
-      <pose>0 0 -0.05 0 0 0</pose>
     </model>
 
     <!-- modify camera view point -->
