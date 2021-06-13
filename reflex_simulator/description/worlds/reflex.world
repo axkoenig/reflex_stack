@@ -14,16 +14,15 @@
       <uri>model://sun</uri>
     </include>
 
-    <!-- this is the standard gazebo ground plane, but with changed friction params -->
+    <!-- using very flat box as a ground plane because bullet collision checking of "plane" elements was often faulty.  -->
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
+            <box>
+              <size>10 10 0.01 0 0 0</size>
+            </box>
           </geometry>
           <surface>
             <friction>
@@ -35,12 +34,10 @@
           </surface>
         </collision>
         <visual name="visual">
-          <cast_shadows>false</cast_shadows>
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
+            <box>
+              <size>10 10 0.01 0 0 0</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -50,6 +47,7 @@
           </material>
         </visual>
       </link>
+      <pose>0 0 -0.005 0 0 0</pose>
     </model>
 
     <!-- modify camera view point -->
