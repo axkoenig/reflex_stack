@@ -28,8 +28,8 @@
     <arg name="cylinder_length" default="0.145" /> -->
 
     <!-- box params -->
-    <arg name="box_x" default="0.10" />
-    <arg name="box_y" default="0.05" />
+    <arg name="box_x" default="0.05" />
+    <arg name="box_y" default="0.10" />
     <arg name="box_z" default="0.15" />
 
     <!-- load object_name to parameter server s.t. we can query it's pose from within the controller node -->
@@ -46,7 +46,7 @@
 
     <!-- box -->
     <param name="object_description" command="
-        $(find xacro)/xacro '$(find description)/urdf/environment/box.urdf.xacro' box_x:=$(arg box_x) box_y:=$(arg box_y) box_z:=$(arg box_z) box_mass:=$(arg object_mass)" if="$(eval arg('object_name') == 'box')"/>
+        $(find xacro)/xacro '$(find description)/urdf/environment/box.urdf.xacro' box_x:=$(arg box_x) box_y:=$(arg box_y) box_z:=$(arg box_z) box_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_name') == 'box')"/>
 
     <!-- spawn object -->
     <node name="object_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param object_description -model $(arg object_spawn_name) -x $(arg origin_x) -y $(arg origin_y) -z $(arg origin_z)" />
