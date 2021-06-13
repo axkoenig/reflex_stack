@@ -21,6 +21,11 @@ private:
     ros::Subscriber proximal_sensor_link_sub;
     ros::Subscriber distal_sensor_link_sub;
 
+    ros::Publisher prox_pub;
+    ros::Publisher dist_pub;
+    ros::Publisher avg_prox_pub;
+    ros::Publisher avg_dist_pub;
+
     std::string proximal_sensor_link_name;
     std::string distal_sensor_link_name;
 
@@ -49,6 +54,8 @@ private:
                                 const float sensor_boundaries[],
                                 const tf2::Transform &world_to_link,
                                 const tf2::Vector3 &link_to_pad_origin,
+                                ros::Publisher &publisher,
+                                ros::Publisher &publisher_avg,
                                 bool verbose = false);
     void proximal_callback(const control_msgs::JointControllerState &msg);
     void proximal_to_flex_callback(const control_msgs::JointControllerState &msg);

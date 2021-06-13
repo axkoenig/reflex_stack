@@ -1,5 +1,6 @@
 #include <math.h>
 
+#include <std_msgs/Float64.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include "gazebo_interface/gazebo_interface.hpp"
@@ -30,6 +31,12 @@ ReflexFinger::ReflexFinger(const int &finger_id)
     flex_to_distal_sub = nh.subscribe(flex_to_distal_topic, 1, &ReflexFinger::flex_to_distal_callback, this);
     proximal_sensor_link_sub = nh.subscribe(proximal_sensor_link_topic, 1, &ReflexFinger::proximal_contacts_callback, this);
     distal_sensor_link_sub = nh.subscribe(distal_sensor_link_topic, 1, &ReflexFinger::distal_contacts_callback, this);
+
+    // publisher for both links
+    prox_pub = nh.advertise<std_msgs::Float64>("/angles/" + proximal_sensor_link_name, 1);
+    dist_pub = nh.advertise<std_msgs::Float64>("/angles/" + distal_sensor_link_name, 1);
+    avg_prox_pub = nh.advertise<std_msgs::Float64>("/avg_angles/" + proximal_sensor_link_name, 1);
+    avg_dist_pub = nh.advertise<std_msgs::Float64>("/avg_angles/" + distal_sensor_link_name, 1);
 
     // compute inner boundaries between sensors along x axis
     float prox_sensor_width = len_prox_pad / 5;
@@ -75,13 +82,13 @@ void ReflexFinger::proximal_contacts_callback(const gazebo_msgs::ContactsState &
 {
     // pad origin is center of pad collision box which surrounds proximal link
     tf2::Transform world_to_prox_link = getLinkPoseSim(&nh, proximal_sensor_link_name, "world", false);
-    eval_contacts_callback(msg, prox_contact_frames, 0, num_prox_sensors, prox_sensor_boundaries, world_to_prox_link, prox_link_to_prox_pad_origin);
+    eval_contacts_callback(msg, prox_contact_frames, 0, num_prox_sensors, prox_sensor_boundaries, world_to_prox_link, prox_link_to_prox_pad_origin, prox_pub, avg_prox_pub);
 }
 
 void ReflexFinger::distal_contacts_callback(const gazebo_msgs::ContactsState &msg)
 {
     tf2::Transform world_to_dist_link = getLinkPoseSim(&nh, distal_sensor_link_name, "world", false);
-    eval_contacts_callback(msg, dist_contact_frames, 5, num_dist_sensors, dist_sensor_boundaries, world_to_dist_link, dist_link_to_dist_pad_origin);
+    eval_contacts_callback(msg, dist_contact_frames, 5, num_dist_sensors, dist_sensor_boundaries, world_to_dist_link, dist_link_to_dist_pad_origin, dist_pub, avg_dist_pub);
 }
 
 tf2::Vector3 ReflexFinger::create_vec_from_msg(const geometry_msgs::Vector3 &msg)
@@ -96,6 +103,8 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
                                           const float sensor_boundaries[],
                                           const tf2::Transform &world_to_link,
                                           const tf2::Vector3 &link_to_pad_origin,
+                                          ros::Publisher &publisher,
+                                          ros::Publisher &publisher_avg,
                                           bool verbose)
 {
     // this method saves the link's contact information in the contact_frame message
@@ -186,6 +195,10 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
                 ROS_INFO_STREAM("state[" << j << "] angle [" << i << "]" << acos(scr.force.dot(scr.normal) / (scr.normal.length() * scr.force.length())) * 180 / M_PI);
             }
 
+            std_msgs::Float64 msg;
+            msg.data = acos(scr.force.dot(scr.normal) / (scr.normal.length() * scr.force.length())) * 180 / M_PI;
+            publisher.publish(msg);
+
             cpb_over_link.results.push_back(scr);
         }
         if (!cpb_over_link.results.empty())
@@ -211,6 +224,26 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
         ROS_INFO_STREAM("angle: " << acos(avg_scr.force.dot(avg_scr.normal) / (avg_scr.normal.length() * avg_scr.force.length())) * 180 / M_PI);
         ROS_WARN("===");
     }
+
+    // TODO REMOVE THESE PUBLISHERS (only for debugging)
+    float angle = acos(avg_scr.force.dot(avg_scr.normal) / (avg_scr.normal.length() * avg_scr.force.length())) * 180 / M_PI;
+    std_msgs::Float64 avg_msg;
+    avg_msg.data = angle;
+    publisher_avg.publish(avg_msg);
+
+    // if (angle > 80)
+    // {
+    //     ROS_WARN("+++++++++");
+    // }
+
+    // ROS_INFO_STREAM("force magnitude:" << avg_scr.force.length());
+    // ROS_INFO_STREAM("angle:" << angle);
+
+    // if (angle > 80)
+    // {
+    //     ROS_WARN("+++++++++");
+    // }
+
     //////////////////////
     // FILL REFLEX SENSORS
     //////////////////////
@@ -235,8 +268,8 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
 
     // fill message
     sensor_listener::ContactFrame cf_msg;
-    cf_msg.sensor_id = first_sensor_idx + sensor_id + 1;    // ranges from 1 to 9
-    cf_msg.hand_part_id = finger_id;                        // ranges from 1 to 3
+    cf_msg.sensor_id = first_sensor_idx + sensor_id + 1; // ranges from 1 to 9
+    cf_msg.hand_part_id = finger_id;                     // ranges from 1 to 3
     cf_msg.palm_contact = false;
     cf_msg.prox_contact = true ? first_sensor_idx == 0 : false;
     cf_msg.dist_contact = true ? first_sensor_idx == 5 : false;
