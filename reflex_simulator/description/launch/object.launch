@@ -33,7 +33,7 @@
     <arg name="box_z" default="0.15" />
 
     <!-- load object_name to parameter server s.t. we can query it's pose from within the controller node -->
-    <param name="object_name" value="object" />
+    <param name="object_name" value="$(arg object_spawn_name)" />
     <param name="object_mass" value="$(arg object_mass)" />
 
     <!-- sphere -->
