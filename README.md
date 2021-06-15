@@ -18,7 +18,8 @@ This repository contains a simulator for Reflex TakkTile robotic hand and the Re
 ___
 <details>
 <summary>Option 1 - Using Docker</summary>
-<br />
+
+___
 
 **(1) Clone**: 
 
@@ -82,7 +83,8 @@ There you have it! But where to go next? If you want to write custom controllers
 ___
 <details>
 <summary>Option 2 - Using plain Ubuntu</summary>
-<br />
+
+___
 
 0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04.
 1. Install ROS Noetic by following [these](http://wiki.ros.org/noetic/Installation/Ubuntu) steps.
@@ -118,7 +120,8 @@ roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ___
 <details>
 <summary>Option 3 - Using Singularity on a Research Cluster</summary>
-<br />
+
+___
 
 **Running Reflex Stack on a Research Cluster**
 
