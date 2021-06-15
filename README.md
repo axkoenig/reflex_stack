@@ -20,7 +20,7 @@ summary h3{ display: inline-block; }
 </style>
 
 <details>
-<summary><h3>Option 1 - Using Docker</h3></summary>
+<summary markdown="span">### Option 1 - Using Docker</summary>
 
 **(1) Clone**: 
 
