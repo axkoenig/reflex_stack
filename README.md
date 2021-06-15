@@ -15,26 +15,40 @@ This repository contains a simulator for Reflex TakkTile robotic hand and the Re
 
 ## Installation
 
-### Option 1: Using Docker
+<style> 
+summary h3{ display: inline-block; }
+</style>
 
-**Build the Container**: If you simply want to try this software out you can download the pre-built image from Dockerhub and skip this step. If you want to modify or extend this software you must build it yourself with the included Dockerfile (this may take a while ...). 
+<details>
+<summary><h3>Option 1 - Using Docker</h3></summary>
+
+**(1) Clone**: 
+
+Clone this repo along with its submodules. 
 
 ```bash 
-git clone --recursive https://github.com/axkoenig/reflex_stack.git
+git clone --recursive git@github.com:axkoenig/reflex_stack.git
 cd reflex_stack
+```
+
+**(2) Build the Container**: 
+
+If you simply want to try this software out you can directly skip to step (3), which will download the pre-built image from Dockerhub. However, if you want to modify or extend this software you must build it yourself with the included Dockerfile (this may take a while as it builds Gazebo from source ...).
+
+```bash 
 docker build -t axkoenig/reflex_stack .
 ```
 
-**Running the Container** 
+**(3) Run the Container** 
 
-Check if everything works by running the container and shelling into it. 
+Run the container and shell into it to check if everything works. The first command will download the pre-build container from Dockerhub if Docker finds no local container named reflex_stack.
 ```bash
 docker run --name sim -it --rm axkoenig/reflex_stack    # in terminal 1: start simulation container
 docker exec -it sim bash -l                             # in terminal 2: shell into container
 rostopic echo /reflex_interface/hand_state              # in terminal 2: print out reflex hand state
 ```
 
-If you want to run multiple simulations on one computer just make sure that no ports overlap. You can specifiy the ports like this.  
+Side-note: If you want to run multiple simulations on one computer just make sure that no ports overlap. You can specifiy the ports like this.  
 ```bash
 # first simulation 
 docker run --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=http://localhost:11321 --name sim_1 -it --rm axkoenig/reflex_stack
@@ -42,17 +56,19 @@ docker run --env ROS_MASTER_URI=http://localhost:11311 --env GAZEBO_MASTER_URI=h
 docker run --env ROS_MASTER_URI=http://localhost:11312 --env GAZEBO_MASTER_URI=http://localhost:11322 --name sim_2 -it --rm axkoenig/reflex_stack
 ```
 
-**Visualizing Simulation**
-If you want to work with the Gazebo GUI follow these steps and you can view it in your browser.
+**(4) Visualize Simulation**
+
+If you want to work with the Gazebo GUI follow these steps and you can view it in your browser. Kill any running containers from step (3). 
 ```bash
-docker-compose up
-localhost:8080/vnc.html                 # type this in your browser 
+docker-compose up          # in the reflex_stack directory
+localhost:8080/vnc.html    # type this in your browser 
 ```
 <img src="docs/docker.png"/>
 
 Note that if you have gzclient installed locally you can follow [this](https://registry.hub.docker.com/_/gazebo) tutorial and check [this](https://www.youtube.com/watch?v=P__phnA57LM) video (which will probably give you a smoother rendering). If you are running the container on Ubuntu check out [this](http://wiki.ros.org/docker/Tutorials/Hardware%20Acceleration) tutorial for hardware acceleration. 
 
-**Interacting with Simulation**
+**(5) Interact with Simulation**
+
 If you want to teleoperate the robotic hand you can fire up the keyboard teleoperation node in a separate terminal. 
 
 ```bash
@@ -60,11 +76,19 @@ docker exec -it sim bash -l
 rosrun reflex_interface finger_teleop_node
 ```
 
-### Option 2: Using plain Ubuntu
+**(6) What next?**
+
+There you have it! But where to go next? If you want to write custom controllers you can write a new ROS node that subscribes to `reflex_takktile/hand_state` and publishes to `reflex_takktile/command_position`. You could also integrate this new node into the Docker network by adding it to the `docker-compose.yml` file.
+</details>
+
+<details>
+<summary><h3>Option 2 - Using plain Ubuntu</h3></summary>
+
+<summary></summary>
+
 0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04.
 1. Install ROS Noetic by following [these](http://wiki.ros.org/noetic/Installation/Ubuntu) steps.
 2. Clone this repository into a new catkin workspace.
-
 ```bash 
 # Init new catkin workspace
 mkdir ~/catkin_ws/src -p
@@ -73,7 +97,6 @@ catkin_init_workspace
 # Clone this repository with its submodules
 git clone --recursive https://github.com/axkoenig/reflex_stack.git
 ```
-
 3. The Reflex Stack was built and tested using Gazebo 11 and DART 6. To run Gazebo with the DART physics engine, you must build Gazebo from source. Running the shell script does this for you. 
 ```bash 
 cd ~/catkin_ws/src/reflex_stack/shell
@@ -92,10 +115,12 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```bash 
 roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ```
-### Option 3: Using Singularity on a Research Cluster
+</details>
 
 <details>
-<summary>Running Reflex Stack on a Research Cluster</summary>
+<summary><h3>Option 3 - Using Singularity on a Research Cluster</h3></summary>
+
+**Running Reflex Stack on a Research Cluster**
 
 You may want to run the Reflex Stack on a cluster to spawn multiple simulations at once. Most research clusters use Singularity on their systems instead of Docker. You can find an in-depth user guide on Singularity [here](https://sylabs.io/guides/3.7/user-guide/). Luckily, [Singularity is tightly integrated with Docker](https://sylabs.io/guides/3.7/user-guide/singularity_and_docker.html). Hence, the easiest way to run the Reflex Stack through Singularity on a cluster is by using its publicly available Docker image. 
 
@@ -117,13 +142,10 @@ singularity run docker://axkoenig/reflex_stack
 # (2) interface with the simulation
 singularity exec docker://axkoenig/reflex_stack bash
 source ${CATKIN_WS}/devel/setup.bash
-rostopic echo /reflex_takktile/hand_state # you can run your custom ROS code here (e.g. "python controller.py")
+rostopic echo /reflex_takktile/hand_state # you can run your custom ROS code here
 ```
 
-</details>
-
-<details>
-<summary>Modifying Reflex Stack and run it on a Research Cluster</summary>
+**Modifying Reflex Stack and run it on a Research Cluster**
 
 You may want to modify the Reflex Stack and run your custom version of it on your cluster. Usually you don't have `sudo` permissions on research clusters, so you'll need to build the image with your modified Reflex Stack on your local machine and then push it to your cluster (`sudo` rights are required to run the `singularity build` command). You have three options: (1) You build a new Docker image from your modified code (like explained above), upload it to Dockerhub and then pull it to the cluster. (2) You locally build a Singularity image from your modified code, upload it to the cluster and run it directly. (3) You can build a Singularity image that only runs ROS and Gazebo (without the Reflex Simulator or RI), push that to the cluster, and once you shell into the image, you can build your modified code with `catkin_make` on the research cluster as usual. Usually options (1) or (2) are fine. I recommend option (3) if you need to update your code frequently, because for option (1) and (2) you will also need to build Gazebo every time which takes a long time.
 
@@ -160,7 +182,7 @@ roslaunch description reflex.launch gui:=false
 
 ## Keyboard Teleoperation
 
-Here are all commands you can do using your keyboard. You can change the key bindings in the [keyboard_teleop.cpp](reflex_interface/src/reflex_interface/keyboard_teleop.cpp) file. You can also use they keyboard teleoperation node on the real hand. Some commands (such as spherical close) are disabled on the real hand as fingers would crash into each other.
+Below is a list of keys that you can use to teleoperate the robotic hand. You can also use they keyboard teleoperation node on the real hand. Some commands (such as spherical close) are disabled on the real hand as fingers may crash into each other.
 
 | Key | Effect              |
 |-----|---------------------|
