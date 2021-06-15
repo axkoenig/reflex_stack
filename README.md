@@ -15,12 +15,10 @@ This repository contains a simulator for Reflex TakkTile robotic hand and the Re
 
 ## Installation
 
-<style> 
-summary h3{ display: inline-block; }
-</style>
-
+___
 <details>
-<summary markdown="block"><h3> Option 1 - Using Docker</h3></summary>
+<summary>Option 1 - Using Docker</summary>
+<br />
 
 **(1) Clone**: 
 
@@ -81,10 +79,10 @@ rosrun reflex_interface finger_teleop_node
 There you have it! But where to go next? If you want to write custom controllers you can write a new ROS node that subscribes to `reflex_takktile/hand_state` and publishes to `reflex_takktile/command_position`. You could also integrate this new node into the Docker network by adding it to the `docker-compose.yml` file.
 </details>
 
+___
 <details>
-<summary><h3>Option 2 - Using plain Ubuntu</h3></summary>
-
-<summary></summary>
+<summary>Option 2 - Using plain Ubuntu</summary>
+<br />
 
 0. Disclaimer: the below steps assume you have a fresh installation of Ubuntu 20.04.
 1. Install ROS Noetic by following [these](http://wiki.ros.org/noetic/Installation/Ubuntu) steps.
@@ -117,8 +115,10 @@ roslaunch description reflex.launch run_keyboard_teleop_nodes:=true
 ```
 </details>
 
+___
 <details>
-<summary><h3>Option 3 - Using Singularity on a Research Cluster</h3></summary>
+<summary>Option 3 - Using Singularity on a Research Cluster</summary>
+<br />
 
 **Running Reflex Stack on a Research Cluster**
 
@@ -179,6 +179,8 @@ source ${CATKIN_WS}/devel/setup.bash
 roslaunch description reflex.launch gui:=false
 ```
 </details>
+
+___
 
 ## Keyboard Teleoperation
 
