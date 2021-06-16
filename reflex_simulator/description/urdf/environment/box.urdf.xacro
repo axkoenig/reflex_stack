@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="box">
 
     <!-- arguments -->
-    <xacro:arg name="box_mass" default="0.2"/>
+    <xacro:arg name="box_mass" default="0.5"/>
     <xacro:arg name="box_x" default="0.08"/>
     <xacro:arg name="box_y" default="0.08"/>
     <xacro:arg name="box_z" default="0.08"/>
