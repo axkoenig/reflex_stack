@@ -171,7 +171,6 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
             // stop if contact on back of finger
             if (contact_position_on_pad[2] < 0.0)
             {
-                ROS_WARN("Ignoring contact on back of finger.");
                 continue;
             }
 

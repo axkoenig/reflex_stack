@@ -60,7 +60,6 @@ void ReflexPalm::contacts_callback(const gazebo_msgs::ContactsState &msg)
             // stop if contact on back of palm
             if (contact_position_on_pad[1] < 0.0)
             {
-                ROS_WARN("Ignoring contact on back of palm.");
                 continue;
             }
 
