@@ -9,14 +9,28 @@
     <arg name="launch_finger_controllers" default="true" />
     <arg name="base_link_name" default="shell" />
     <arg name="spawn_new_world" default="true" />
+    <arg name="output" default="screen" />
+
+    <!-- object parameters that will be passed on object launch file -->
+    <arg name="spawn_object" default="true" />
+    <arg name="origin_x" default="0.0" />
+    <arg name="origin_y" default="0.2" />
+    <arg name="origin_z" default="0.2" />
+    <arg name="object_mass" default="0.5" />
+    <arg name="inertia_scaling_factor" default="1" />
+    <arg name="object_type" default="cylinder" /> <!-- currently supports "sphere", "box", "cylinder" -->
+    <arg name="object_name" default="object" />
+    <arg name="sphere_radius" default="0.08" />
+    <arg name="cylinder_radius" default="0.04" />
+    <arg name="cylinder_length" default="0.15" />
+    <arg name="box_x" default="0.05" />
+    <arg name="box_y" default="0.10" />
+    <arg name="box_z" default="0.15" />
 
     <!-- this is a parameter on real reflex which we simulate: any sensor pressure below the threshold will not be reported as a contact 
          the param is necessary on real hand because sensors are noisy and usually report pressures \in [-3,3] if there is no contact. -->
     <arg name="default_contact_threshold" default="5" />
     <param name="default_contact_threshold" value="$(arg default_contact_threshold)" />
-
-    <!-- grasp and object poses -->
-    <rosparam file="$(find description)/config/grasp_poses.yaml"/>
 
     <!-- tell reflex_interface that we're running in simulation -->
     <arg name="use_sim_data_hand" default="true" />
@@ -32,10 +46,6 @@
          "view" -> "collisions" in Gazebo to see the collision meshes -->
     <arg name="simplify_collisions" default="true" />
     <param name="simplify_collisions" value="$(arg simplify_collisions)" />
-
-    <!-- currently supports "sphere", "box", "cylinder" -->
-    <arg name="spawn_object" default="true" />
-    <arg name="object_name" default="cylinder" />
 
     <!-- load robot_name to parameter server -->
     <arg name="robot_name" default="reflex" />
@@ -64,9 +74,21 @@
 
     <!-- spawning objects here first (before spawning reflex) -->
     <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="$(arg origin_x)"/>
+        <arg name="origin_y" value="$(arg origin_y)"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="$(arg object_type)"/>
         <arg name="object_name" value="$(arg object_name)"/>
-        <arg name="inertia_scaling_factor" value="0.9"/>
+        <arg name="sphere_radius" value="$(arg sphere_radius)"/>
+        <arg name="cylinder_radius" value="$(arg cylinder_radius)"/>
+        <arg name="cylinder_length" value="$(arg cylinder_length)"/>
+        <arg name="box_x" value="$(arg box_x)"/>
+        <arg name="box_y" value="$(arg box_y)"/>
+        <arg name="box_z" value="$(arg box_z)"/>
     </include>
+
     <param name="robot_description" command="
         $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name) reflex_pub_rate:=$(arg reflex_pub_rate) simplify_collisions:=$(arg simplify_collisions)"/>
 
@@ -76,15 +98,15 @@
     <arg name="reflex_spawn_delay" default="2" />
     <arg name="nodes_spawn_delay" default="4" />
 
-    <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
+    <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
 
     <!-- Keyboard teleoperation node for wrist and fingers-->
     <group if="$(arg run_keyboard_teleop_nodes)">
-        <node pkg="reflex_interface" type="finger_teleop_node" name="finger_teleop_node" output="screen" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
+        <node pkg="reflex_interface" type="finger_teleop_node" name="finger_teleop_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
         <!-- TODO: I would like to split functionality (into a wrist teleop node and a finger teleop node and run both at once, but 
         keyboard input doesn't work smoothly if both nodes are run, presumably because two nodes are reading from the keyboard and 
         they interfere. Leaving wrist + finger controller combined in finger_teleop_node for now, because it works better. -->
-        <!-- <node pkg="wrist_controller" type="wrist_teleop_node" name="wrist_teleop_node" output="screen"/> -->
+        <!-- <node pkg="wrist_controller" type="wrist_teleop_node" name="wrist_teleop_node" output="$(arg output)"/> -->
     </group>
 
     <!-- Launch controllers -->
@@ -96,12 +118,12 @@
 
     <!-- Sensors node -->
     <group if="$(arg run_sensors_node)">
-        <node pkg="sensor_listener" type="sensor_listener_node" name="sensor_listener_node" output="screen" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
+        <node pkg="sensor_listener" type="sensor_listener_node" name="sensor_listener_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
     </group>
 
     <!-- Run reflex interface node -->
     <group if="$(arg run_reflex_interface_node)">
-        <node pkg="reflex_interface" type="reflex_interface_node" name="reflex_interface_node" output="screen" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
+        <node pkg="reflex_interface" type="reflex_interface_node" name="reflex_interface_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
     </group>
 
     <!-- Wrist controller node -->

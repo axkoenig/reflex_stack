@@ -13,8 +13,8 @@
     <arg name="inertia_scaling_factor" default="1" />
 
     <!-- currently supports "sphere", "box", "cylinder" -->
-    <arg name="object_name" default="sphere" />
-    <arg name="object_spawn_name" default="object" />
+    <arg name="object_type" default="sphere" />
+    <arg name="object_name" default="object" />
 
     <!-- sphere params -->
     <arg name="sphere_radius" default="0.08" />
@@ -33,21 +33,21 @@
     <arg name="box_z" default="0.15" />
 
     <!-- load object_name to parameter server s.t. we can query it's pose from within the controller node -->
-    <param name="object_name" value="$(arg object_spawn_name)" />
+    <param name="object_name" value="$(arg object_name)" />
     <param name="object_mass" value="$(arg object_mass)" />
 
     <!-- sphere -->
     <param name="object_description" command="
-        $(find xacro)/xacro '$(find description)/urdf/environment/sphere.urdf.xacro' sphere_radius:=$(arg sphere_radius) sphere_mass:=$(arg object_mass)" if="$(eval arg('object_name') == 'sphere')"/>
+        $(find xacro)/xacro '$(find description)/urdf/environment/sphere.urdf.xacro' sphere_radius:=$(arg sphere_radius) sphere_mass:=$(arg object_mass)" if="$(eval arg('object_type') == 'sphere')"/>
 
     <!-- cylinder -->
     <param name="object_description" command="
-        $(find xacro)/xacro '$(find description)/urdf/environment/cylinder.urdf.xacro' cylinder_radius:=$(arg cylinder_radius) cylinder_length:=$(arg cylinder_length) cylinder_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_name') == 'cylinder')"/>
+        $(find xacro)/xacro '$(find description)/urdf/environment/cylinder.urdf.xacro' cylinder_radius:=$(arg cylinder_radius) cylinder_length:=$(arg cylinder_length) cylinder_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_type') == 'cylinder')"/>
 
     <!-- box -->
     <param name="object_description" command="
-        $(find xacro)/xacro '$(find description)/urdf/environment/box.urdf.xacro' box_x:=$(arg box_x) box_y:=$(arg box_y) box_z:=$(arg box_z) box_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_name') == 'box')"/>
+        $(find xacro)/xacro '$(find description)/urdf/environment/box.urdf.xacro' box_x:=$(arg box_x) box_y:=$(arg box_y) box_z:=$(arg box_z) box_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_type') == 'box')"/>
 
     <!-- spawn object -->
-    <node name="object_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param object_description -model $(arg object_spawn_name) -x $(arg origin_x) -y $(arg origin_y) -z $(arg origin_z)" />
+    <node name="object_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param object_description -model $(arg object_name) -x $(arg origin_x) -y $(arg origin_y) -z $(arg origin_z)" />
 </launch>
