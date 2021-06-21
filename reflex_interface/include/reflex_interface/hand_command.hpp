@@ -69,7 +69,7 @@ private:
     // TODO REMOVE THIS (hand state should do this)
     std::vector<bool> fingers_in_contact = {0, 0, 0};
     ros::Subscriber sim_state_sub;
-    void sim_state_callback(const sensor_listener::ContactFrames &msg);
+    void simStateCallback(const sensor_listener::ContactFrames &msg);
     
     std::string getStatusMsg();
 

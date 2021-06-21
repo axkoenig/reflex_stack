@@ -18,7 +18,7 @@ HandCommand::HandCommand(ros::NodeHandle *nh, HandState *state, bool use_sim_dat
     close_until_contact_service = nh->advertiseService(close_until_contact_srv_name, &HandCommand::callbackCloseUntilContact, this);
     tighten_grip_service = nh->advertiseService(tighten_grip_srv_name, &HandCommand::callbackTightenGrip, this);
 
-    sim_state_sub = nh->subscribe("reflex_takktile/sim_contact_frames", 1, &HandCommand::sim_state_callback, this);
+    sim_state_sub = nh->subscribe("reflex_takktile/sim_contact_frames", 1, &HandCommand::simStateCallback, this);
 
     if (!use_sim_data_hand)
     {
@@ -57,7 +57,7 @@ std::string HandCommand::getStatusMsg()
     return msg;
 }
 
-void HandCommand::sim_state_callback(const sensor_listener::ContactFrames &msg)
+void HandCommand::simStateCallback(const sensor_listener::ContactFrames &msg)
 {
     fingers_in_contact = {0, 0, 0};
     for (int i = 0; i < int(msg.contact_frames_world.size()); i++)
