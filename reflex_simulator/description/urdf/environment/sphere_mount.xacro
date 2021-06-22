@@ -1,29 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="sphere_mount">
 
-    <xacro:arg name="sphere_radius" default="0.08"/>
-    <xacro:arg name="ground_offset" default="0.03"/>
     <xacro:arg name="box_mass" default="1"/>
-
-    <!-- convert args to properties -->
-    <xacro:property name="sphere_radius" value="$(arg sphere_radius)"/>
-    <xacro:property name="ground_offset" value="$(arg ground_offset)"/>
-    <xacro:property name="sphere_holder_z_offset" value="0.015"/>
+    <xacro:property name="mount_z_offset" value="-0.022"/>
 
     <!-- parametrization of sphere mount -->
-    <xacro:property name="cos_45deg" value="0.707"/>
-    <xacro:property name="sin_45deg" value="0.707"/>
-    <xacro:property name="cos_30deg" value="0.866"/>
-    <xacro:property name="sin_30deg" value="0.5"/>
+    <xacro:property name="box_x" value="0.15"/>
+    <xacro:property name="box_y" value="${2*box_x}"/>
+    <xacro:property name="box_z" value="0.01"/>
+    <xacro:property name="rotation_y" value="${-5*pi/180}"/>
     <xacro:property name="sqrt_2" value="1.414"/>
-    <xacro:property name="box_x" value="${((sphere_radius+ground_offset)/cos_30deg - (sphere_radius+ground_offset))/sqrt_2}"/>
-    <xacro:property name="box_y" value="${3*box_x}"/>
-    <xacro:property name="center_offset" value="${sin_30deg*sphere_radius}"/>
-    <xacro:property name="box_z" value="${2*center_offset+sqrt_2*box_x}"/>
-
-    <xacro:property name="mount_top_x" value="${box_x}"/>
-    <xacro:property name="mount_top_y" value="${box_y*2}"/>
-    <xacro:property name="mount_top_z" value="${box_z*1.5}"/>
 
     <xacro:include filename="$(find description)/urdf/xacro_macros/inertia_tensors.xacro"/>
 
@@ -31,67 +17,39 @@
 
     <xacro:macro name="sphere_mount_link" params="id origin_x origin_y rotation_z">
 
-        <joint name="sphere_mount_base_joint_${id}" type="fixed">
-            <origin xyz="0 0 ${sphere_holder_z_offset}" rpy="0 0 ${pi/4}"/>
+        <joint name="sphere_mount_joint_${id}" type="fixed">
+            <origin xyz="0 0 ${mount_z_offset}" rpy="0 0 ${pi/4}"/>
             <parent link="world"/>
-            <child link="sphere_mount_base_${id}"/>
+            <child link="sphere_mount_${id}"/>
         </joint>
-        <link name="sphere_mount_base_${id}">
+        <link name="sphere_mount_${id}">
             <visual>
-                <origin xyz="${origin_x} ${origin_y} ${box_x/2}" rpy="${pi/2} ${pi/2.5} ${rotation_z}" />
+                <origin xyz="${origin_x} ${origin_y} ${box_z}" rpy="0 ${rotation_y} ${rotation_z}" />
                 <geometry>
                     <box size="${box_x} ${box_y} ${box_z}" />
                 </geometry>
             </visual>
             <collision>
-                <origin xyz="${origin_x} ${origin_y} ${box_x/2}" rpy="${pi/2} ${pi/2.5} ${rotation_z}" />
+                <origin xyz="${origin_x} ${origin_y} ${box_z}" rpy="0 ${rotation_y} ${rotation_z}" />
                 <geometry>
                     <box size="${box_x} ${box_y} ${box_z}" />
                 </geometry>
             </collision>
             <inertial>
-                <origin xyz="${origin_x} ${origin_y} ${box_x/2}" rpy="${pi/2} ${pi/2.5} ${rotation_z}" />
+                <origin xyz="${origin_x} ${origin_y} ${box_z}" rpy="0 ${rotation_y} ${rotation_z}" />
                 <mass value="$(arg box_mass)"/>
-                <xacro:cuboid_inertia m="$(arg box_mass)" x="${box_x}" y="${box_y}" z=" ${box_z}"/>
+                <xacro:cuboid_inertia m="$(arg box_mass)" x="${box_x}" y="${box_y}" z="${box_z}"/>
             </inertial>
         </link>
 
-        <!-- <joint name="sphere_mount_top_joint_${id}" type="fixed">
-            <origin xyz="${origin_x} ${origin_y} ${2*box_x}" rpy="0 0 ${rotation_z}"/>
-            <parent link="sphere_mount_base_${id}"/>
-            <child link="sphere_mount_top_${id}"/>
-        </joint>
-        <link name="sphere_mount_top_${id}">
-            <visual>
-                <origin xyz="${mount_top_x} 0 0" rpy="${pi/2} ${pi/4} 0" />
-                <geometry>
-                    <box size="${mount_top_x} ${mount_top_y} ${mount_top_z}" />
-                </geometry>
-            </visual>
-            <collision>
-                <origin xyz="${mount_top_x} 0 0" rpy="${pi/2} ${pi/4} 0" />
-                <geometry>
-                    <box size="${mount_top_x} ${mount_top_y} ${mount_top_z}" />
-                </geometry>
-            </collision>
-            <inertial>
-                <origin xyz="${mount_top_x} 0 0" rpy="${pi/2} ${pi/4} 0" />
-                <mass value="$(arg box_mass)"/>
-                <xacro:cuboid_inertia m="$(arg box_mass)" x="${mount_top_x}" y="${mount_top_y}" z=" ${mount_top_z}"/>
-            </inertial>
-        </link> -->
-
-        <gazebo reference="sphere_mount_base_${id}">
-            <material>Gazebo/Grey</material>
-        </gazebo>
-        <gazebo reference="sphere_mount_top_${id}">
+        <gazebo reference="sphere_mount_${id}">
             <material>Gazebo/Grey</material>
         </gazebo>
     </xacro:macro>
 
-    <xacro:sphere_mount_link id="1" origin_x="${center_offset}" origin_y="${0}" rotation_z="${0}"/>
-    <xacro:sphere_mount_link id="2" origin_x="${0}" origin_y="${center_offset}" rotation_z="${pi/2}"/>
-    <xacro:sphere_mount_link id="3" origin_x="${-center_offset}" origin_y="${0}" rotation_z="${pi}"/>
-    <xacro:sphere_mount_link id="4" origin_x="${0}" origin_y="${-center_offset}" rotation_z="${3*pi/2}"/>
+    <xacro:sphere_mount_link id="1" origin_x="${box_x/2}" origin_y="${0}" rotation_z="${0}"/>
+    <xacro:sphere_mount_link id="2" origin_x="${0}" origin_y="${box_y/4}" rotation_z="${pi/2}"/>
+    <xacro:sphere_mount_link id="3" origin_x="${-box_x/2}" origin_y="${0}" rotation_z="${pi}"/>
+    <xacro:sphere_mount_link id="4" origin_x="${0}" origin_y="${-box_y/4}" rotation_z="${3*pi/2}"/>
 
 </robot>
