@@ -18,9 +18,10 @@
     <arg name="origin_z" default="0.2" />
     <arg name="object_mass" default="0.5" />
     <arg name="inertia_scaling_factor" default="1" />
-    <arg name="object_type" default="cylinder" /> <!-- currently supports "sphere", "box", "cylinder" -->
+    <!-- object_type currently supports "sphere", "box", "cylinder" -->
+    <arg name="object_type" default="sphere" />
     <arg name="object_name" default="object" />
-    <arg name="sphere_radius" default="0.08" />
+    <arg name="sphere_radius" default="0.06" />
     <arg name="cylinder_radius" default="0.04" />
     <arg name="cylinder_length" default="0.15" />
     <arg name="box_x" default="0.05" />
@@ -88,6 +89,11 @@
         <arg name="box_y" value="$(arg box_y)"/>
         <arg name="box_z" value="$(arg box_z)"/>
     </include>
+
+    <!-- spawn a ground plane if we're not spawning an object -->
+    <group if="$(eval not arg('spawn_object'))">
+        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find description)/urdf/environment/ground_plane.sdf -model ground_plane -x 0 -y 0 -z 0" />
+    </group>
 
     <param name="robot_description" command="
         $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name) reflex_pub_rate:=$(arg reflex_pub_rate) simplify_collisions:=$(arg simplify_collisions)"/>
