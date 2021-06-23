@@ -12,7 +12,7 @@
     <!-- spawns a ground_plane for cylinder and box, and a concave pit for a sphere -->
     <arg name="spawn_ground" default="true" />
     <!-- makes sure that ground is spawned before the object-->
-    <arg name="object_spawn_delay" default="1" />
+    <arg name="object_spawn_delay" default="2" />
 
     <!-- sometimes, scaling the inertia down a little can give better force readings -->
     <arg name="inertia_scaling_factor" default="1" />
@@ -41,16 +41,11 @@
     <param name="object_name" value="$(arg object_name)" />
     <param name="object_mass" value="$(arg object_mass)" />
 
-    <!-- ground for box and cylinder -->
-    <group if="$(eval arg('spawn_ground') and (arg('object_type') == 'box' or arg('object_type') == 'cylinder'))">
-        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find description)/urdf/environment/ground_plane.sdf -model ground_plane -x 0 -y 0 -z 0" />
-    </group>
-
-    <!-- ground for sphere -->
-    <group if="$(eval arg('spawn_ground') and arg('object_type') == 'sphere')">
-        <param name="ground_description" command="
+    <!-- sphere_mount -->
+    <group if="$(eval arg('object_type') == 'sphere')">
+        <param name="sphere_mount" command="
         $(find xacro)/xacro '$(find description)/urdf/environment/sphere_mount.xacro'"/>
-        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param ground_description -model ground_plane -x $(arg origin_x) -y $(arg origin_y) -z 0" />
+        <node name="sphere_mount_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param sphere_mount -model sphere_mount -x $(arg origin_x) -y $(arg origin_y) -z 0" />
     </group>
 
     <!-- cylinder -->
