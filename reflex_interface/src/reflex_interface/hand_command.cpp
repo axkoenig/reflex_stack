@@ -284,11 +284,10 @@ bool HandCommand::executePosIncrement(float increment[4], bool from_measured_pos
     std::array<float, 4> cur_state;
     if (from_measured_pos)
     {
-        // TODO maybe add 4th DOF back in state->motor_states[3]->getJointAngle()
         cur_state = {state->motor_states[0]->getJointAngle(),
                      state->motor_states[1]->getJointAngle(),
                      state->motor_states[2]->getJointAngle(),
-                     0};
+                     state->motor_states[3]->getJointAngle()};
     }
     else
     {
@@ -298,7 +297,16 @@ bool HandCommand::executePosIncrement(float increment[4], bool from_measured_pos
     for (int i = 0; i < 4; i++)
     {
         float val = cur_state[i] + increment[i];
-        if (val > low_limits[i] && val < high_limits[i])
+
+        if (val < low_limits[i])
+        {
+            cur_cmd[i] = low_limits[i];
+        }
+        else if (val > high_limits[i])
+        {
+            cur_cmd[i] = high_limits[i];
+        }
+        else
         {
             cur_cmd[i] = val;
         }
