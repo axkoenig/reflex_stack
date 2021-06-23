@@ -23,11 +23,6 @@ GraspQuality::GraspQuality(float mu_epsilon, float mu_delta, int num_edges, Cont
     this->num_edges = num_edges;
     this->contact_model = contact_model;
     beta = atan(mu_epsilon);
-
-    // define task wrenches (how much total task wrench has to be applied from fingers to object)
-    float obj_mass = 0.5;
-    float obj_weight = obj_mass * 9.81; // grasp must resist only gravity for now (quasi-static assumption)
-    tp.add_task_wrench(tf2::Vector3(0, 0, obj_weight), tf2::Vector3(0, 0, 0));
 }
 
 bool GraspQuality::isValidNumContacts()
@@ -343,7 +338,8 @@ Eigen::MatrixXd GraspQuality::getGraspMatrix(const std::vector<tf2::Transform> &
     return G;
 }
 
-float GraspQuality::getSlipMarginWithTaskWrenches(std::vector<tf2::Vector3> &contact_forces,
+float GraspQuality::getSlipMarginWithTaskWrenches(const TaskPolytope tp,
+                                                  std::vector<tf2::Vector3> &contact_forces,
                                                   std::vector<tf2::Vector3> &contact_normals,
                                                   const std::vector<tf2::Transform> &contact_frames,
                                                   const tf2::Vector3 &object_position,
@@ -435,7 +431,7 @@ float GraspQuality::getSlipMargin(std::vector<tf2::Vector3> &contact_normals,
     // we can't resist wrenches if there are no contacts
     if (!num_contacts)
     {
-        return 0; 
+        return 0;
     }
 
     std::vector<float> weighted_slip_margins;

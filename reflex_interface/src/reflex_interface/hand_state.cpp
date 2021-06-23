@@ -29,7 +29,8 @@ HandState::HandState(ros::NodeHandle *nh, bool use_sim_data_hand, bool use_sim_d
 bool HandState::allFingersInContact()
 {
     boost::lock_guard<boost::mutex> guard(mtx);
-    return std::all_of(vars.fingers_in_contact.begin(), vars.fingers_in_contact.end(), [](bool v) { return v; });
+    return std::all_of(vars.fingers_in_contact.begin(), vars.fingers_in_contact.end(), [](bool v)
+                       { return v; });
 }
 
 int HandState::getNumFingersInContact()
@@ -170,12 +171,23 @@ void HandState::updateQualityMetrics()
         boost::lock_guard<boost::mutex> guard(mtx);
         grasp_quality.fillEpsilonFTSeparate(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin(), vars.epsilon_force, vars.epsilon_torque);
         vars.delta_cur = grasp_quality.getSlipMargin(vars.contact_normals, vars.contact_forces, vars.contact_force_magnitudes, vars.num_contacts);
-        vars.delta_task = grasp_quality.getSlipMarginWithTaskWrenches(vars.contact_forces, vars.contact_normals, vars.contact_frames, obj_measured.getOrigin(), vars.num_contacts);
+        vars.delta_task = grasp_quality.getSlipMarginWithTaskWrenches(getTaskWrenches(), vars.contact_forces, vars.contact_normals, vars.contact_frames, obj_measured.getOrigin(), vars.num_contacts);
     }
     else
     {
         // on real hand (without knowing the object pose) we can only calculate the epsilon force
     }
+}
+
+TaskPolytope HandState::getTaskWrenches()
+{
+    TaskPolytope tp = TaskPolytope();
+    float obj_mass;
+    getParam(nh, &obj_mass, "object_mass", false);
+    // define task wrenches (how much total task wrench has to be applied from fingers to object)
+    float obj_weight = obj_mass * 9.81; // grasp must resist only gravity for now (quasi-static assumption)
+    tp.add_task_wrench(tf2::Vector3(0, 0, obj_weight), tf2::Vector3(0, 0, 0));
+    return tp;
 }
 
 HandState::ContactState HandState::getContactState()

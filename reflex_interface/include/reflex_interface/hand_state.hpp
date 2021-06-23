@@ -13,6 +13,7 @@
 #include "reflex_interface/motor_state.hpp"
 #include "reflex_interface/hand_state_variables.hpp"
 #include "reflex_interface/grasp_quality.hpp"
+#include "reflex_interface/task_polytope.hpp"
 #include "sensor_listener/ContactFrames.h"
 
 class HandState
@@ -61,6 +62,7 @@ private:
     void updateHandStateSim();
     void broadcastModelState(tf2::Transform tf, std::string source_frame, std::string target_frame, tf2_ros::TransformBroadcaster *br);
     void updateQualityMetrics();
+    TaskPolytope getTaskWrenches();
     reflex_interface::HandStateStamped getHandStateMsg();
     tf2::Vector3 create_vec_from_msg(const geometry_msgs::Vector3 &msg);
 };
