@@ -172,6 +172,7 @@ void HandState::updateQualityMetrics()
         grasp_quality.fillEpsilonFTSeparate(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin(), vars.epsilon_force, vars.epsilon_torque);
         vars.delta_cur = grasp_quality.getSlipMargin(vars.contact_normals, vars.contact_forces, vars.contact_force_magnitudes, vars.num_contacts);
         vars.delta_task = grasp_quality.getSlipMarginWithTaskWrenches(getTaskWrenches(), vars.contact_forces, vars.contact_normals, vars.contact_frames, obj_measured.getOrigin(), vars.num_contacts);
+        vars.epsilon = grasp_quality.getEpsilon(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin());
     }
     else
     {
