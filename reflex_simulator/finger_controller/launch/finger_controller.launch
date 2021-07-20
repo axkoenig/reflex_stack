@@ -1,17 +1,18 @@
 <launch>
   <arg name="spawn_delay" default="0" />
   <arg name="only_spawn" default="false" />
+  <arg name="output" default="screen" />
 
   <group if="$(eval not only_spawn)">
     <!-- Load joint controller configurations from YAML file to parameter server -->
     <rosparam file="$(find finger_controller)/config/reflex_control.yaml" command="load"/>
 
     <!-- launch finger finger_controller -->
-    <node pkg="finger_controller" type="finger_controller_node" name="finger_controller_node" respawn="false" output="screen" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' "/>
+    <node pkg="finger_controller" type="finger_controller_node" name="finger_controller_node" respawn="false" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' "/>
   </group>
 
   <!-- load the controllers -->
-  <node name="finger_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="gazebo" args="joint_state_controller 
+  <node name="finger_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="$(arg output)" ns="gazebo" args="joint_state_controller 
     finger_1_preshape_position_controller 
     finger_2_preshape_position_controller 
     finger_1_proximal_position_controller 
