@@ -7,10 +7,23 @@
     <arg name="use_sim_data_obj" default="false" />
     <param name="use_sim_data_obj" value="$(arg use_sim_data_obj)" />
 
-    <!-- Keyboard teleoperation node for fingers and wrist (TODO be careful that you're not sending wrist position to UR5!)-->
-    <node pkg="reflex_interface" type="finger_teleop_node" name="finger_teleop_node" output="screen"/>
+    <arg name="spawn_delay" default="0" />
+    <arg name="run_keyboard_teleop_nodes" default="false" />
+
+    <!-- option to calculate quality metrics (we don't need all so let's save computation time by not calculating all) -->
+    <arg name="calc_epsilon" default="false" />
+    <param name="calc_epsilon" value="$(arg calc_epsilon)" />
+    <arg name="calc_epsilon_ft_separate" default="true" />
+    <param name="calc_epsilon_ft_separate" value="$(arg calc_epsilon_ft_separate)" />
+    <arg name="calc_delta" default="true" />
+    <param name="calc_delta" value="$(arg calc_delta)" />
 
     <!-- Run reflex interface node -->
-    <node pkg="reflex_interface" type="reflex_interface_node" name="reflex_interface_node" output="screen"/>
+    <node pkg="reflex_interface" type="reflex_interface_node" name="reflex_interface_node" output="screen" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' " />
+    
+    <!-- Keyboard teleoperation node for wrist and fingers-->
+    <group if="$(arg run_keyboard_teleop_nodes)">
+        <node pkg="reflex_interface" type="finger_teleop_node" name="finger_teleop_node" output="screen" launch-prefix="bash -c 'sleep $(arg spawn_delay); $0 $@' " />
+    </group>
 
 </launch>

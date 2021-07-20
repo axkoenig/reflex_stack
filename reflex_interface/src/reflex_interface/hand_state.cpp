@@ -169,10 +169,30 @@ void HandState::updateQualityMetrics()
         // TODO maybe add back in (once ROS fixes this bug https://github.com/ros/geometry2/issues/467 and I dont get bombarded with warning messages anymore)
         // broadcastModelState(obj_measured, "world", "reflex_interface/obj_measured", &br_obj_measured);
         boost::lock_guard<boost::mutex> guard(mtx);
-        grasp_quality.fillEpsilonFTSeparate(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin(), vars.epsilon_force, vars.epsilon_torque);
-        vars.delta_cur = grasp_quality.getSlipMargin(vars.contact_normals, vars.contact_forces, vars.contact_force_magnitudes, vars.num_contacts);
-        vars.delta_task = grasp_quality.getSlipMarginWithTaskWrenches(getTaskWrenches(), vars.contact_forces, vars.contact_normals, vars.contact_frames, obj_measured.getOrigin(), vars.num_contacts);
-        vars.epsilon = grasp_quality.getEpsilon(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin());
+
+        bool calc_metric = false;
+
+        // epsilon
+        getParam(nh, &calc_metric, "calc_epsilon", false);
+        if (calc_metric)
+        {
+            vars.epsilon = grasp_quality.getEpsilon(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin());
+        }
+
+        // epsilon force torque separate
+        getParam(nh, &calc_metric, "calc_epsilon_ft_separate", false);
+        if (calc_metric)
+        {
+            grasp_quality.fillEpsilonFTSeparate(vars.contact_positions, vars.contact_normals, obj_measured.getOrigin(), vars.epsilon_force, vars.epsilon_torque);
+        }
+
+        // delta
+        getParam(nh, &calc_metric, "calc_delta", false);
+        if (calc_metric)
+        {
+            vars.delta_cur = grasp_quality.getSlipMargin(vars.contact_normals, vars.contact_forces, vars.contact_force_magnitudes, vars.num_contacts);
+            vars.delta_task = grasp_quality.getSlipMarginWithTaskWrenches(getTaskWrenches(), vars.contact_forces, vars.contact_normals, vars.contact_frames, obj_measured.getOrigin(), vars.num_contacts);
+        }
     }
     else
     {

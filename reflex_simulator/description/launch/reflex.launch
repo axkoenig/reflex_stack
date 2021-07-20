@@ -35,9 +35,7 @@
 
     <!-- tell reflex_interface that we're running in simulation -->
     <arg name="use_sim_data_hand" default="true" />
-    <param name="use_sim_data_hand" value="$(arg use_sim_data_hand)" />
     <arg name="use_sim_data_obj" default="true" />
-    <param name="use_sim_data_obj" value="$(arg use_sim_data_obj)" />
 
     <!-- effective publishing rate of real reflex is 40Hz -->
     <arg name="reflex_pub_rate" default="40" />
@@ -106,15 +104,6 @@
 
     <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
 
-    <!-- Keyboard teleoperation node for wrist and fingers-->
-    <group if="$(arg run_keyboard_teleop_nodes)">
-        <node pkg="reflex_interface" type="finger_teleop_node" name="finger_teleop_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
-        <!-- TODO: I would like to split functionality (into a wrist teleop node and a finger teleop node and run both at once, but 
-        keyboard input doesn't work smoothly if both nodes are run, presumably because two nodes are reading from the keyboard and 
-        they interfere. Leaving wrist + finger controller combined in finger_teleop_node for now, because it works better. -->
-        <!-- <node pkg="wrist_controller" type="wrist_teleop_node" name="wrist_teleop_node" output="$(arg output)"/> -->
-    </group>
-
     <!-- Launch controllers -->
     <group if="$(arg launch_finger_controllers)">
         <include file="$(find finger_controller)/launch/finger_controller.launch">
@@ -129,7 +118,12 @@
 
     <!-- Run reflex interface node -->
     <group if="$(arg run_reflex_interface_node)">
-        <node pkg="reflex_interface" type="reflex_interface_node" name="reflex_interface_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
+        <include file="$(find reflex_interface)/launch/reflex_interface.launch">
+            <arg name="spawn_delay" value="$(arg nodes_spawn_delay)" />
+            <arg name="use_sim_data_hand" value="$(arg use_sim_data_hand)" />
+            <arg name="use_sim_data_obj" value="$(arg use_sim_data_obj)" />
+            <arg name="run_keyboard_teleop_nodes" value="$(arg run_keyboard_teleop_nodes)" />
+        </include>
     </group>
 
     <!-- Wrist controller node -->
