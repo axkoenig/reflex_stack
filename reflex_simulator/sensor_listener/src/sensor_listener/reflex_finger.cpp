@@ -253,8 +253,8 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
     sensors[first_sensor_idx + sensor_id]->addContactToBuffer(true);
 
     // contact sensors can only sense normal forces, hence get rid of tangential components via scalar projection
-    float normal_force = avg_scr.force.dot(link_z) / link_z.length();
-    sensors[first_sensor_idx + sensor_id]->addPressureToBuffer(normal_force);
+    float sensor_normal_force = avg_scr.force.dot(link_z) / link_z.length();
+    sensors[first_sensor_idx + sensor_id]->addPressureToBuffer(sensor_normal_force);
 
     //////////////////////
     // FILL ROS MESSAGE
@@ -264,6 +264,11 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
     tf2::Vector3 world_x = tf2::Vector3{1, 0, 0};
     tf2::Quaternion rot_x_to_normal = tf2::shortestArcQuatNormalize2(world_x, avg_scr.normal);
     tf2::Transform contact_frame = tf2::Transform(rot_x_to_normal, avg_scr.position);
+
+    // extract basis vectors of transform
+    tf2::Vector3 cf_x = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{1, 0, 0});
+    tf2::Vector3 cf_y = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{0, 1, 0});
+    tf2::Vector3 cf_z = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{0, 0, 1});
 
     // fill message
     sensor_listener::ContactFrame cf_msg;
@@ -279,6 +284,9 @@ void ReflexFinger::eval_contacts_callback(const gazebo_msgs::ContactsState &msg,
     cf_msg.contact_frame = tf2::toMsg(contact_frame);
     cf_msg.contact_position = tf2::toMsg(avg_scr.position);
     cf_msg.contact_normal = tf2::toMsg(avg_scr.normal);
+    cf_msg.normal_force = avg_scr.force.dot(cf_x);
+    cf_msg.tang_force_y = avg_scr.force.dot(cf_y);
+    cf_msg.tang_force_z = avg_scr.force.dot(cf_z);
 
     contact_frames.push_back(cf_msg);
 };

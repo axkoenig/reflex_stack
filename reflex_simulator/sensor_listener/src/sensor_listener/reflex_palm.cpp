@@ -100,6 +100,11 @@ void ReflexPalm::contacts_callback(const gazebo_msgs::ContactsState &msg)
     tf2::Quaternion rot_x_to_normal = tf2::shortestArcQuatNormalize2(world_x, avg_scr.normal);
     tf2::Transform contact_frame = tf2::Transform(rot_x_to_normal, avg_scr.position);
 
+    // extract basis vectors of transform
+    tf2::Vector3 cf_x = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{1, 0, 0});
+    tf2::Vector3 cf_y = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{0, 1, 0});
+    tf2::Vector3 cf_z = tf2::quatRotate(rot_x_to_normal, tf2::Vector3{0, 0, 1});
+
     // fill remaining message
     cf_msg.sensor_id = 0;
     cf_msg.hand_part_id = 0;
@@ -113,6 +118,9 @@ void ReflexPalm::contacts_callback(const gazebo_msgs::ContactsState &msg)
     cf_msg.contact_frame = tf2::toMsg(contact_frame);
     cf_msg.contact_position = tf2::toMsg(avg_scr.position);
     cf_msg.contact_normal = tf2::toMsg(avg_scr.normal);
+    cf_msg.normal_force = avg_scr.force.dot(cf_x);
+    cf_msg.tang_force_y = avg_scr.force.dot(cf_y);
+    cf_msg.tang_force_z = avg_scr.force.dot(cf_z);
 
     contact_frames.push_back(cf_msg);
 }
