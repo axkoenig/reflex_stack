@@ -90,7 +90,7 @@
 
     <!-- spawn a ground plane if we're not spawning an object -->
     <group if="$(eval not arg('spawn_object'))">
-        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find description)/urdf/environment/ground_plane.sdf -model ground_plane -x 0 -y 0 -z 0" />
+        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-sdf -file $(find description)/urdf/environment/ground_plane.sdf -model ground_plane -x 0 -y 0 -z 0" />
     </group>
 
     <param name="robot_description" command="
