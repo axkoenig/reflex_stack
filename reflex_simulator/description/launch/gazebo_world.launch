@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- gazebo arguments  -->
+    <arg name="debug" default="false" />
+    <arg name="gui" default="true" />
+    <arg name="pause" default="false" />
+    <arg name="world_name" default="$(find description)/worlds/reflex.world" />
+
+    <!-- include gazebo_ros launcher -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)" />
+        <arg name="use_sim_time" value="true" />
+        <arg name="physics" value="dart" />
+        <arg name="verbose" value="true" />
+    </include>
+
+</launch>
