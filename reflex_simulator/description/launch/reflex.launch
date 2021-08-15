@@ -93,8 +93,8 @@
     <!-- wait before launching reflex (this makes sure that the contact normals are pointing from reflex to object. this actually is an easy fix (simply everse contact normals and forces when pointing the wrong way) 
          but for some reason the spawning order also influences how Gazebo calculates forces. I noticed that forces are more "usable" and stable when normals point from reflex to object.
          TODO check if this is really a Gazebo bug or if we can treat this in a nicer way ...-->
-    <arg name="reflex_spawn_delay" default="2" />
-    <arg name="nodes_spawn_delay" default="4" />
+    <arg name="reflex_spawn_delay" default="4" />
+    <arg name="nodes_spawn_delay" default="5" />
 
     <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
 
