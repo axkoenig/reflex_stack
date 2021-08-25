@@ -2,10 +2,10 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="sphere_mount">
 
     <xacro:arg name="box_mass" default="1"/>
-    <xacro:property name="mount_z_offset" value="-0.022"/>
+    <xacro:property name="mount_z_offset" value="-0.04"/>
 
     <!-- parametrization of sphere mount -->
-    <xacro:property name="box_x" value="0.15"/>
+    <xacro:property name="box_x" value="0.07"/>
     <xacro:property name="box_y" value="${2*box_x}"/>
     <xacro:property name="box_z" value="0.01"/>
     <xacro:property name="rotation_y" value="${-5*pi/180}"/>

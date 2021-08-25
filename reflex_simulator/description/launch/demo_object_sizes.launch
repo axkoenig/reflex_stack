@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- custom arguments -->
+    <arg name="run_sensors_node" default="true" />
+    <arg name="run_wrist_controller_node" default="true" />
+    <arg name="run_keyboard_teleop_nodes" default="true" />
+    <arg name="run_reflex_interface_node" default="true" />
+    <arg name="launch_finger_controllers" default="true" />
+    <arg name="base_link_name" default="shell" />
+    <arg name="spawn_new_world" default="true" />
+    <arg name="output" default="screen" />
+
+    <!-- object parameters that will be passed on object launch file -->
+    <arg name="spawn_object" default="true" />
+    <arg name="origin_x" default="0.0" />
+    <arg name="origin_y" default="0.2" />
+    <arg name="origin_z" default="0.2" />
+    <arg name="object_mass" default="0.5" />
+    <arg name="inertia_scaling_factor" default="1" />
+    <!-- object_type currently supports "sphere", "box", "cylinder" -->
+    <arg name="object_type" default="sphere" />
+    <arg name="object_name" default="object" />
+    <arg name="sphere_radius" default="0.06" />
+    <arg name="cylinder_radius" default="0.04" />
+    <arg name="cylinder_length" default="0.15" />
+    <arg name="box_x" default="0.05" />
+    <arg name="box_y" default="0.10" />
+    <arg name="box_z" default="0.15" />
+
+    <!-- this is a parameter on real reflex which we simulate: any sensor pressure below the threshold will not be reported as a contact 
+         the param is necessary on real hand because sensors are noisy and usually report pressures \in [-3,3] if there is no contact. -->
+    <arg name="default_contact_threshold" default="5" />
+    <param name="default_contact_threshold" value="$(arg default_contact_threshold)" />
+
+    <!-- tell reflex_interface that we're running in simulation -->
+    <arg name="use_sim_data_hand" default="true" />
+    <arg name="use_sim_data_obj" default="true" />
+
+    <!-- effective publishing rate of real reflex is 40Hz -->
+    <arg name="reflex_pub_rate" default="40" />
+    <param name="reflex_pub_rate" value="$(arg reflex_pub_rate)" />
+
+    <!-- "true" will significantly speed up your simulation as I use simplfied collision meshes. Turn on
+         "view" -> "collisions" in Gazebo to see the collision meshes -->
+    <arg name="simplify_collisions" default="true" />
+    <param name="simplify_collisions" value="$(arg simplify_collisions)" />
+
+    <!-- load robot_name to parameter server -->
+    <arg name="robot_name" default="reflex" />
+    <param name="robot_name" value="$(arg robot_name)" />
+
+    <!-- if running on real robot or in simulation_only (relevant for baseline_commander.cpp) -->
+    <arg name="simulation_only" default="true" />
+    <param name="simulation_only" value="$(arg simulation_only)" />
+
+    <arg name="debug" default="false" />
+    <arg name="gui" default="true" />
+    <arg name="pause" default="false" />
+
+    <!-- include gazebo_ros launcher -->
+    <include file="$(find description)/launch/gazebo_world.launch" if="$(arg spawn_new_world)">
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="pause" value="$(arg pause)"/>
+    </include>
+
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="$(arg origin_x)"/>
+        <arg name="origin_y" value="0.1"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="box"/>
+        <arg name="object_name" value="box_s"/>
+        <arg name="sphere_radius" value="$(arg sphere_radius)"/>
+        <arg name="cylinder_radius" value="$(arg cylinder_radius)"/>
+        <arg name="cylinder_length" value="$(arg cylinder_length)"/>
+        <arg name="box_x" value="0.04"/>
+        <arg name="box_y" value="0.04"/>
+        <arg name="box_z" value="0.13"/>
+    </include>
+
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="$(arg origin_x)"/>
+        <arg name="origin_y" value="0.25"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="box"/>
+        <arg name="object_name" value="box_l"/>
+        <arg name="sphere_radius" value="$(arg sphere_radius)"/>
+        <arg name="cylinder_radius" value="$(arg cylinder_radius)"/>
+        <arg name="cylinder_length" value="$(arg cylinder_length)"/>
+        <arg name="box_x" value="0.10"/>
+        <arg name="box_y" value="0.1"/>
+        <arg name="box_z" value="0.23"/>
+    </include>
+
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="$(arg origin_x)"/>
+        <arg name="origin_y" value="0.4"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="cylinder"/>
+        <arg name="object_name" value="cylinder_s"/>
+        <arg name="sphere_radius" value="$(arg sphere_radius)"/>
+        <arg name="cylinder_radius" value="0.03"/>
+        <arg name="cylinder_length" value="0.13"/>
+        <arg name="box_x" value="$(arg box_x)"/>
+        <arg name="box_y" value="$(arg box_y)"/>
+        <arg name="box_z" value="$(arg box_z)"/>
+    </include>
+
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="$(arg origin_x)"/>
+        <arg name="origin_y" value="0.55"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="cylinder"/>
+        <arg name="object_name" value="cylinder_l"/>
+        <arg name="sphere_radius" value="$(arg sphere_radius)"/>
+        <arg name="cylinder_radius" value="0.05"/>
+        <arg name="cylinder_length" value="0.23"/>
+        <arg name="box_x" value="$(arg box_x)"/>
+        <arg name="box_y" value="$(arg box_y)"/>
+        <arg name="box_z" value="$(arg box_z)"/>
+    </include>
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="0.25"/>
+        <arg name="origin_y" value="0.25"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="sphere"/>
+        <arg name="object_name" value="sphere_s"/>
+        <arg name="sphere_radius" value="0.065"/>
+        <arg name="cylinder_radius" value="$(arg cylinder_radius)"/>
+        <arg name="cylinder_length" value="$(arg cylinder_length)"/>
+        <arg name="box_x" value="$(arg box_x)"/>
+        <arg name="box_y" value="$(arg box_y)"/>
+        <arg name="box_z" value="$(arg box_z)"/>
+    </include>
+
+    <include file="$(find description)/launch/object.launch" if="$(arg spawn_object)">
+        <arg name="origin_x" value="0.25"/>
+        <arg name="origin_y" value="0.55"/>
+        <arg name="origin_z" value="$(arg origin_z)"/>
+        <arg name="object_mass" value="$(arg object_mass)"/>
+        <arg name="inertia_scaling_factor" value="$(arg inertia_scaling_factor)"/>
+        <arg name="object_type" value="sphere"/>
+        <arg name="object_name" value="sphere_l"/>
+        <arg name="sphere_radius" value="0.08"/>
+        <arg name="cylinder_radius" value="$(arg cylinder_radius)"/>
+        <arg name="cylinder_length" value="$(arg cylinder_length)"/>
+        <arg name="box_x" value="$(arg box_x)"/>
+        <arg name="box_y" value="$(arg box_y)"/>
+        <arg name="box_z" value="$(arg box_z)"/>
+    </include>
+    
+
+    <!-- spawn a ground plane if we're not spawning an object -->
+    <group if="$(eval not arg('spawn_object'))">
+        <node name="ground_description_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-sdf -file $(find description)/urdf/environment/ground_plane.sdf -model ground_plane -x 0 -y 0 -z 0" />
+    </group>
+
+    <param name="robot_description" command="
+        $(find xacro)/xacro '$(find description)/robots/reflex.robot.xacro' only_reflex:=true base_link_name:=$(arg base_link_name) reflex_pub_rate:=$(arg reflex_pub_rate) simplify_collisions:=$(arg simplify_collisions)"/>
+
+    <!-- wait before launching reflex (this makes sure that the contact normals are pointing from reflex to object. this actually is an easy fix (simply everse contact normals and forces when pointing the wrong way) 
+         but for some reason the spawning order also influences how Gazebo calculates forces. I noticed that forces are more "usable" and stable when normals point from reflex to object.
+         TODO check if this is really a Gazebo bug or if we can treat this in a nicer way ...-->
+    <arg name="reflex_spawn_delay" default="4" />
+    <arg name="nodes_spawn_delay" default="5" />
+
+    <node name="reflex_spawn" pkg="gazebo_ros" type="spawn_model" output="$(arg output)" args="-urdf -param robot_description -model $(arg robot_name)" launch-prefix="bash -c 'sleep $(arg reflex_spawn_delay); $0 $@' " />
+
+    <!-- Launch controllers -->
+    <group if="$(arg launch_finger_controllers)">
+        <include file="$(find finger_controller)/launch/finger_controller.launch">
+            <arg name="spawn_delay" value="$(arg nodes_spawn_delay)" />
+        </include>
+    </group>
+
+    <!-- Sensors node -->
+    <group if="$(arg run_sensors_node)">
+        <node pkg="sensor_listener" type="sensor_listener_node" name="sensor_listener_node" output="$(arg output)" launch-prefix="bash -c 'sleep $(arg nodes_spawn_delay); $0 $@' " />
+    </group>
+
+    <!-- Run reflex interface node -->
+    <group if="$(arg run_reflex_interface_node)">
+        <include file="$(find reflex_interface)/launch/reflex_interface.launch">
+            <arg name="spawn_delay" value="$(arg nodes_spawn_delay)" />
+            <arg name="use_sim_data_hand" value="$(arg use_sim_data_hand)" />
+            <arg name="use_sim_data_obj" value="$(arg use_sim_data_obj)" />
+            <arg name="run_keyboard_teleop_nodes" value="$(arg run_keyboard_teleop_nodes)" />
+        </include>
+    </group>
+
+    <!-- Wrist controller node -->
+    <group if="$(arg run_wrist_controller_node)">
+        <include file="$(find wrist_controller)/launch/wrist_controller.launch">
+            <arg name="spawn_delay" value="$(arg nodes_spawn_delay)" />
+        </include>
+    </group>
+
+</launch>

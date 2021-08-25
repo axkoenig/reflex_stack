@@ -41,26 +41,30 @@
     <param name="object_name" value="$(arg object_name)" />
     <param name="object_mass" value="$(arg object_mass)" />
 
+    <arg name="sphere_mount_name" default="$(eval 'sphere_mount_spawn_' + arg('object_name'))" />
+
     <!-- sphere_mount -->
     <group if="$(eval arg('object_type') == 'sphere')">
-        <param name="sphere_mount" command="
+        <param name="$(arg sphere_mount_name)" command="
         $(find xacro)/xacro '$(find description)/urdf/environment/sphere_mount.xacro'"/>
-        <node name="sphere_mount_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param sphere_mount -model sphere_mount -x $(arg origin_x) -y $(arg origin_y) -z 0" />
+        <node name="$(arg sphere_mount_name)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param $(arg sphere_mount_name) -model $(arg sphere_mount_name) -x $(arg origin_x) -y $(arg origin_y) -z 0" />
     </group>
 
+    <arg name="object_description" default="$(eval 'object_description' + arg('object_name'))" />
+
     <!-- cylinder -->
-    <param name="object_description" command="
+    <param name="$(arg object_description)" command="
         $(find xacro)/xacro '$(find description)/urdf/environment/cylinder.urdf.xacro' cylinder_radius:=$(arg cylinder_radius) cylinder_length:=$(arg cylinder_length) cylinder_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_type') == 'cylinder')"/>
 
     <!-- box -->
-    <param name="object_description" command="
+    <param name="$(arg object_description)" command="
         $(find xacro)/xacro '$(find description)/urdf/environment/box.urdf.xacro' box_x:=$(arg box_x) box_y:=$(arg box_y) box_z:=$(arg box_z) box_mass:=$(arg object_mass) inertia_scaling_factor:=$(arg inertia_scaling_factor)" if="$(eval arg('object_type') == 'box')"/>
 
     <!-- sphere -->
-    <param name="object_description" command="
+    <param name="$(arg object_description)" command="
         $(find xacro)/xacro '$(find description)/urdf/environment/sphere.urdf.xacro' sphere_radius:=$(arg sphere_radius) sphere_mass:=$(arg object_mass)" if="$(eval arg('object_type') == 'sphere')"/>
 
     <!-- spawn object -->
-    <node name="object_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param object_description -model $(arg object_name) -x $(arg origin_x) -y $(arg origin_y) -z $(arg origin_z)" launch-prefix="bash -c 'sleep $(arg object_spawn_delay); $0 $@' "/>
+    <node name="$(eval 'object_spawn_' + arg('object_name'))" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param $(arg object_description) -model $(arg object_name) -x $(arg origin_x) -y $(arg origin_y) -z $(arg origin_z)" launch-prefix="bash -c 'sleep $(arg object_spawn_delay); $0 $@' "/>
 
 </launch>
