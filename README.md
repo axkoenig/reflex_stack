@@ -1,6 +1,6 @@
 # Reflex Stack
 
-[![Build Status](https://travis-ci.com/axkoenig/reflex_stack.svg?token=KeJradpJgXCJqZfQ8pwB&branch=main)](https://travis-ci.com/axkoenig/reflex_stack)
+[![Build Status](https://app.travis-ci.com/axkoenig/reflex_stack.svg?branch=main)](https://app.travis-ci.com/axkoenig/reflex_stack)
 
 <img src="docs/screenshot.png"/>
 
