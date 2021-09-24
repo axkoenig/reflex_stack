@@ -4,6 +4,21 @@
 
 <img src="docs/screenshot.png"/>
 
+## Citation
+
+If you use this software in your research, please cite our [paper](https://arxiv.org/abs/2109.11234), which is currently in review.
+
+```bash
+@misc{koenig2021tactile,
+      title={Tactile Grasp Refinement using Deep Reinforcement Learning and Analytic Grasp Stability Metrics}, 
+      author={Alexander Koenig and Zixi Liu and Lucas Janson and Robert Howe},
+      year={2021},
+      eprint={2109.11234},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
+```
+
 ## System Architecture 
 This repository contains a simulator for Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
 
