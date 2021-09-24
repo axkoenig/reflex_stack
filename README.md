@@ -20,7 +20,7 @@ If you use this software in your research, please cite our [paper](https://arxiv
 ```
 
 ## System Architecture 
-This repository contains a simulator for Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
+This repository contains a simulator for the Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
 
 **Reflex Simulator**: The idea behind the Reflex simulator is that you swap out the simulator for the real hand without any hassle. To achieve this, the simulator uses the same ROS topics and message definitions as the real hand does. We model some features of the Reflex, such as the tactile sensors and the underactuated distal flexure. 
 
