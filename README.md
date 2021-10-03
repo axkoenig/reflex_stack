@@ -1,11 +1,26 @@
 # Reflex Stack
 
-[![Build Status](https://travis-ci.com/axkoenig/reflex_stack.svg?token=KeJradpJgXCJqZfQ8pwB&branch=main)](https://travis-ci.com/axkoenig/reflex_stack)
+[![Build Status](https://app.travis-ci.com/axkoenig/reflex_stack.svg?branch=main)](https://app.travis-ci.com/axkoenig/reflex_stack)
 
 <img src="docs/screenshot.png"/>
 
+## Citation
+
+If you use this software in your research, please cite our [paper](https://arxiv.org/abs/2109.11234), which is currently in review.
+
+```bash
+@misc{koenig2021tactile,
+      title={Tactile Grasp Refinement using Deep Reinforcement Learning and Analytic Grasp Stability Metrics}, 
+      author={Alexander Koenig and Zixi Liu and Lucas Janson and Robert Howe},
+      year={2021},
+      eprint={2109.11234},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
+```
+
 ## System Architecture 
-This repository contains a simulator for Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
+This repository contains a simulator for the Reflex TakkTile robotic hand and the Reflex Interface, an accompanying C++ library. 
 
 **Reflex Simulator**: The idea behind the Reflex simulator is that you swap out the simulator for the real hand without any hassle. To achieve this, the simulator uses the same ROS topics and message definitions as the real hand does. We model some features of the Reflex, such as the tactile sensors and the underactuated distal flexure. 
 
