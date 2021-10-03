@@ -200,6 +200,31 @@ roslaunch description reflex.launch gui:=false
 
 ___
 
+## High-Level Interaction
+
+The Reflex Interface offers several high-level ROS services to automate functions that are commonly used by grasping controllers. Below is a list of all ROS services provided by the Reflex Interface. 
+
+```bash
+# services for pre-configured grasping positions 
+/reflex_interface/open
+/reflex_interface/close
+/reflex_interface/pinch
+/reflex_interface/spherical_close
+/reflex_interface/spherical_open
+# services to trigger other actions
+/reflex_interface/close_until_contact
+/reflex_interface/position_increment
+/reflex_interface/tighten_grip
+```
+
+Calling a ROS service is a simple one-liner in your terminal. You can use auto-complete in your terminal to get a stub of the service definition. 
+
+```bash
+# some services don't take any arguments
+rosservice call /reflex_interface/close_until_contact "{}"
+# some services do
+rosservice call /reflex_interface/position_increment "{f1: 0.2, f2: 0.4, f3: 0.3, preshape: 1.5, from_measured_pos: true, blocking: false, tolerance: 0.01, time_out: 0.0}" 
+```
 ## Keyboard Teleoperation
 
 Below is a list of keys that you can use to teleoperate the robotic hand. You can also use they keyboard teleoperation node on the real hand. Some commands (such as spherical close) are disabled on the real hand as fingers may crash into each other.
